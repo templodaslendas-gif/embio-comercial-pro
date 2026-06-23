@@ -13,18 +13,22 @@
 ```env
 # .env.local (NUNCA commitar)
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<anon-key>
+VITE_SUPABASE_PUBLISHABLE_KEY=<anon-key>
 
 # Apenas server-side / Edge Functions
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 ```
 
+> **ATENÇÃO**: O código usa `VITE_SUPABASE_PUBLISHABLE_KEY` (não `VITE_SUPABASE_ANON_KEY`).
+> Configurar com o nome errado causa tela branca em produção.
+> No Vercel: Settings → Environment Variables → usar exatamente `VITE_SUPABASE_PUBLISHABLE_KEY`.
+
 ### Onde Usar Cada Chave
 
-| Chave             | Frontend | Edge Function | NUNCA                    |
-|-------------------|----------|---------------|--------------------------|
-| `anon_key`        | ✅ SIM   | Opcional      | Sem RLS em dados privados|
-| `service_role`    | ❌ NÃO   | ✅ SIM        | Exposta ao cliente       |
+| Chave                          | Frontend | Edge Function | NUNCA                    |
+|--------------------------------|----------|---------------|--------------------------|
+| `VITE_SUPABASE_PUBLISHABLE_KEY`| ✅ SIM   | Opcional      | Sem RLS em dados privados|
+| `SUPABASE_SERVICE_ROLE_KEY`    | ❌ NÃO   | ✅ SIM        | Exposta ao cliente       |
 
 ## Auth
 
