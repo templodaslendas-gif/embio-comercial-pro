@@ -94,4 +94,46 @@ Registro cronológico de trabalho realizado no projeto.
 
 ---
 
+## 2026-06-23 (sessão 4)
+
+### Sessão: Preparação do Repositório GitHub
+
+**Responsável**: Agente Líder  
+**Fase**: Migração — controle de versão
+
+**O que foi feito:**
+- Verificado `.gitignore` existente — ausência de proteção explícita para `.env`
+- Atualizado `.gitignore` para cobrir: `.env`, `.env.*`, `.env.local`, `.env.*.local`, `bun.lockb`, `backups/`
+- Rodado `git init` — repositório inicializado em `C:/Users/Usuario/Desktop/Embio-Comercial-Pro/.git/`
+- Rodado `git add .` e verificado `git status` — `.env` confirmado ausente dos arquivos staged (corretamente ignorado)
+- Verificado `.claude/settings.local.json` — `attribution.commit` NÃO configurado → sem trailer `Co-Authored-By`
+- Criado primeiro commit: `59778d5 chore: migrate Embio AgroCalc from Lovable base`
+  - 154 arquivos commitados, 22.180 inserções
+
+**Arquivos no commit (categorias):**
+- Governança raiz: `AGENTS.md`, `CLAUDE.md`, `DATABASE-RULES.md`, `MIGRATION-PLAN.md`, `PROJECT-README.md`, `README.md`, `SECURITY-CHECKLIST.md`, `SUPABASE-RULES.md`, `WORKLOG.md`, `.gitignore`
+- Agentes: `agents/*.md` (8 arquivos)
+- Documentação: `docs/*.md` (6 arquivos)
+- Auditorias: `audits/*.md` (5 arquivos)
+- Código fonte: `src/**` (todo o código da aplicação)
+- Migrações Supabase: `supabase/migrations/*.sql` (8 arquivos)
+- Config: `package.json`, `vite.config.ts`, `tailwind.config.ts`, `tsconfig*.json`, `eslint.config.js`, `postcss.config.js`, `components.json`, `vitest.config.ts`, `index.html`
+- Lock files (seguros): `bun.lock`, `package-lock.json`
+
+**Confirmado NÃO commitado (corretamente ignorado):**
+- `.env` ✅
+- `node_modules/` ✅
+- `dist/` ✅
+- `backups/` ✅
+- `bun.lockb` ✅
+
+**Status final:** `On branch master — nothing to commit, working tree clean`
+
+**Próximos passos (aguardando aprovação):**
+- [ ] Criar repositório no GitHub e fazer push
+- [ ] Criar novo projeto Supabase independente
+- [ ] Configurar Vercel
+
+---
+
 _Adicionar novas entradas no topo desta seção, com data e responsável._
