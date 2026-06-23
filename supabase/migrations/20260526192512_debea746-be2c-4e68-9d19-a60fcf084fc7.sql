@@ -1,0 +1,1 @@
+ALTER TABLE public.branding_settings ADD COLUMN IF NOT EXISTS slogan text, ADD COLUMN IF NOT EXISTS company_name text;
