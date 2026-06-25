@@ -37,3 +37,5 @@ bun.lockb
 
 # Backups locais
 backups/
+
+.vercel
