@@ -11,6 +11,7 @@ import {
   FileText, CheckCircle2, Clock, XCircle, Package, Cog, ChevronDown, ChevronUp,
   Plus, Users, Palette, BookOpen, TrendingUp, BarChart3, PieChart as PieIcon, Inbox,
 } from "lucide-react";
+import { WeatherWidget } from "@/modules/commercial/dashboard";
 import {
   AreaChart, Area, XAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -385,6 +386,23 @@ const Index = () => {
                 <span className="text-sm font-medium text-foreground truncate">{a.label}</span>
               </Link>
             ))}
+          </div>
+        </section>
+
+        {/* WEATHER + CATÁLOGO PLACEHOLDER */}
+        <section className="grid gap-5 grid-cols-1 sm:grid-cols-2 animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <WeatherWidget />
+          <div className="rounded-2xl border border-dashed border-border/30 bg-card/30 backdrop-blur p-4 flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted/20 shrink-0">
+              <Package className="h-4 w-4 text-muted-foreground/50" />
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-muted-foreground/70">Catálogo de Itens</p>
+              <p className="text-[11px] text-muted-foreground/50">Em preparação — disponível na próxima fase</p>
+            </div>
+            <span className="text-[10px] border border-border/30 text-muted-foreground/40 rounded-full px-2 py-0.5 shrink-0">
+              em breve
+            </span>
           </div>
         </section>
 
