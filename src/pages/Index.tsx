@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,8 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   FileText, CheckCircle2, Clock, XCircle, Package, Cog, ChevronDown, ChevronUp,
   Plus, Users, Palette, BookOpen, TrendingUp, BarChart3, PieChart as PieIcon, Inbox,
+  LayoutList,
 } from "lucide-react";
 import { WeatherWidget } from "@/modules/commercial/dashboard";
+import { fetchCatalogo } from "@/lib/orcamentoQueries";
 import {
   AreaChart, Area, XAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -213,6 +216,18 @@ const Index = () => {
   });
   const moneyFmt = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
+  const { data: catalogoItens = [] } = useQuery({
+    queryKey: ["catalogo"],
+    queryFn: fetchCatalogo,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const catalogoStats = useMemo(() => ({
+    total: catalogoItens.length,
+    ativos: catalogoItens.filter((i) => i.ativo).length,
+    categorias: new Set(catalogoItens.map((i) => i.categoria).filter(Boolean)).size,
+  }), [catalogoItens]);
+
   const premiumCard =
     "border border-border/40 rounded-3xl bg-card/70 backdrop-blur-xl shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)] hover:shadow-[0_14px_40px_-12px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 transition-all duration-300";
 
@@ -389,21 +404,37 @@ const Index = () => {
           </div>
         </section>
 
-        {/* WEATHER + CATÁLOGO PLACEHOLDER */}
+        {/* WEATHER + CATÁLOGO STATS */}
         <section className="grid gap-5 grid-cols-1 sm:grid-cols-2 animate-fade-in" style={{ animationDelay: "100ms" }}>
           <WeatherWidget />
-          <div className="rounded-2xl border border-dashed border-border/30 bg-card/30 backdrop-blur p-4 flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted/20 shrink-0">
-              <Package className="h-4 w-4 text-muted-foreground/50" />
-            </span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-muted-foreground/70">Catálogo de Itens</p>
-              <p className="text-[11px] text-muted-foreground/50">Em preparação — disponível na próxima fase</p>
+          <Link
+            to="/catalogo"
+            className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl p-4 hover:border-primary/30 hover:bg-card/90 transition-all duration-300 group block"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <LayoutList className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Catálogo de Itens</p>
+                <p className="text-[11px] text-muted-foreground">Produtos e serviços</p>
+              </div>
             </div>
-            <span className="text-[10px] border border-border/30 text-muted-foreground/40 rounded-full px-2 py-0.5 shrink-0">
-              em breve
-            </span>
-          </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.total} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Total</p>
+              </div>
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.ativos} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Ativos</p>
+              </div>
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.categorias} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Categorias</p>
+              </div>
+            </div>
+          </Link>
         </section>
 
         {/* METRIC CARDS */}

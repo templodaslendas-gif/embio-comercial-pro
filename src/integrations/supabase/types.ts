@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalogo_itens: {
+        Row: {
+          ativo: boolean
+          categoria: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          nome_item: string
+          observacoes: string | null
+          ordem: number
+          unidade: string | null
+          updated_at: string
+          user_id: string
+          valor_unitario: number
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome_item: string
+          observacoes?: string | null
+          ordem?: number
+          unidade?: string | null
+          updated_at?: string
+          user_id: string
+          valor_unitario?: number
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome_item?: string
+          observacoes?: string | null
+          ordem?: number
+          unidade?: string | null
+          updated_at?: string
+          user_id?: string
+          valor_unitario?: number
+        }
+        Relationships: []
+      }
       branding_settings: {
         Row: {
           accent_color: string | null

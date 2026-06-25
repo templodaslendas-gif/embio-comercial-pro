@@ -14,6 +14,7 @@ import {
   Flame,
   Rocket,
   Palette,
+  LayoutList,
 } from "lucide-react";
 import { useBranding } from "@/hooks/useBranding";
 import { NavLink } from "@/components/NavLink";
@@ -54,6 +55,7 @@ export function AppSidebar() {
     { title: t("sidebar.dashboard"), url: "/", icon: LayoutDashboard },
     { title: t("sidebar.newQuote"), url: "/novo-orcamento", icon: FileText },
     { title: t("sidebar.myClients"), url: "/meus-clientes", icon: Users },
+    { title: "Catálogo", url: "/catalogo", icon: LayoutList },
   ];
 
   const produtoItems = [
