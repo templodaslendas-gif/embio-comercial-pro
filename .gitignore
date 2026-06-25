@@ -39,3 +39,6 @@ bun.lockb
 backups/
 
 .vercel
+
+# Supabase temp files
+supabase/.temp/
