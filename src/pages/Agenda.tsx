@@ -252,8 +252,8 @@ export default function Agenda() {
                         <CalendarDays className="h-7 w-7" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-foreground">Nenhum compromisso cadastrado</p>
-                        <p className="text-xs mt-0.5">Clique em "Novo Compromisso" para começar</p>
+                        <p className="font-medium text-sm text-foreground">Nenhuma visita agendada.</p>
+                        <p className="text-xs mt-0.5">Organize seus próximos atendimentos no campo.</p>
                       </div>
                       <Button size="sm" onClick={openNew}>
                         <Plus className="h-3.5 w-3.5 mr-1" />Novo Compromisso

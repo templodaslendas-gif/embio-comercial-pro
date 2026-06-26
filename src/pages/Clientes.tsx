@@ -212,8 +212,8 @@ export default function Clientes() {
                         <Users className="h-7 w-7" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-foreground">Nenhum cliente cadastrado</p>
-                        <p className="text-xs mt-0.5">Clique em "Novo Cliente" para começar</p>
+                        <p className="font-medium text-sm text-foreground">Nenhum cliente cadastrado ainda.</p>
+                        <p className="text-xs mt-0.5">Comece pela primeira propriedade.</p>
                       </div>
                       <Button size="sm" onClick={openNew}>
                         <Plus className="h-3.5 w-3.5 mr-1" />

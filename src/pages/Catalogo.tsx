@@ -235,8 +235,8 @@ export default function Catalogo() {
                         <Package className="h-7 w-7" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-foreground">Nenhum item cadastrado</p>
-                        <p className="text-xs mt-0.5">Clique em "Novo Item" para começar seu catálogo</p>
+                        <p className="font-medium text-sm text-foreground">Nenhum item no catálogo.</p>
+                        <p className="text-xs mt-0.5">Cadastre produtos, aditivos ou serviços.</p>
                       </div>
                       <Button size="sm" onClick={openNew}>
                         <Plus className="h-3.5 w-3.5 mr-1" />

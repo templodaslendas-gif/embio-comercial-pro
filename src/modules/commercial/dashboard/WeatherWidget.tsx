@@ -104,77 +104,65 @@ export function WeatherWidget() {
   const showDeniedBanner = permission === "denied";
 
   return (
-    <div className="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/15 via-card/80 to-primary/10 backdrop-blur-sm p-3 space-y-2">
+    <div className="p-4 space-y-3">
       {showPromptBanner && (
-        <div className="flex items-center justify-between gap-2 rounded-lg bg-primary/10 border border-primary/20 px-2.5 py-1.5">
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-accent/10 border border-accent/20 px-2.5 py-1.5">
           <div className="flex items-center gap-1.5 text-xs text-foreground min-w-0">
-            <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+            <MapPin className="h-3.5 w-3.5 text-accent shrink-0" />
             <span className="truncate">Usar sua localização?</span>
           </div>
-          <Button
-            size="sm"
-            className="h-7 px-2.5 text-xs shrink-0"
-            onClick={requestLocation}
-            disabled={requesting}
-          >
+          <Button size="sm" className="h-7 px-2.5 text-xs shrink-0" onClick={requestLocation} disabled={requesting}>
             {requesting ? "..." : "Permitir"}
           </Button>
         </div>
       )}
-
       {showDeniedBanner && (
-        <div className="flex items-center justify-between gap-2 rounded-lg bg-muted/60 border border-border px-2.5 py-1.5">
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground min-w-0">
-            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">Localização bloqueada — ative no navegador.</span>
-          </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-7 px-2 text-[11px] shrink-0"
-            onClick={requestLocation}
-            disabled={requesting}
-          >
-            Tentar
-          </Button>
+        <div className="flex items-center gap-1.5 rounded-lg bg-muted/50 border border-border px-2.5 py-1.5 text-[11px] text-muted-foreground">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">Localização bloqueada — ative no navegador.</span>
+          <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px] shrink-0 ml-auto" onClick={requestLocation} disabled={requesting}>Tentar</Button>
         </div>
       )}
-
       {isLoading || !data ? (
-        <div className="h-20 animate-pulse rounded-lg bg-background/30" />
+        <div className="h-28 animate-pulse rounded-lg bg-muted/30" />
       ) : (
         <>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{coords.name}</span>
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="flex items-start justify-between gap-4">
+            <div>
               {(() => {
                 const CurrentIcon = iconFor(data.current?.weather_code ?? 0);
                 const currentTemp = Math.round(data.current?.temperature_2m ?? 0);
+                const todayMax = Math.round(data.daily?.temperature_2m_max?.[0] ?? 0);
+                const todayMin = Math.round(data.daily?.temperature_2m_min?.[0] ?? 0);
+                const desc = descFor(data.current?.weather_code ?? 0);
                 return (
                   <>
-                    <CurrentIcon className="h-6 w-6 text-accent" />
-                    <span className="text-xl font-bold tabular-nums">{currentTemp}°</span>
+                    <div className="flex items-end gap-2.5">
+                      <CurrentIcon className="h-9 w-9 text-accent mb-1 shrink-0" />
+                      <span className="text-4xl font-bold tabular-nums leading-none text-foreground">{currentTemp}°</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground/70 mt-1.5">{desc} · max {todayMax}° min {todayMin}°</p>
                   </>
                 );
               })()}
             </div>
+            <div className="flex items-center gap-1 text-[10px] text-muted-foreground/50 mt-0.5 shrink-0">
+              <MapPin className="h-3 w-3" />
+              <span className="truncate max-w-[110px]">{coords.name}</span>
+            </div>
           </div>
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1 pt-2.5 border-t border-border/30">
             {data.daily.time.map((t: string, i: number) => {
               const Icon = iconFor(data.daily.weather_code[i]);
               const max = Math.round(data.daily.temperature_2m_max[i]);
               const min = Math.round(data.daily.temperature_2m_min[i]);
               const day = format(new Date(t + "T00:00:00"), "EEE", { locale: ptBR }).slice(0, 3);
               return (
-                <div key={t} className="flex flex-col items-center gap-0.5 rounded-lg py-1.5 bg-background/40">
-                  <span className="text-[10px] uppercase font-medium text-muted-foreground">{day}</span>
-                  <Icon className="h-4 w-4 text-primary" />
-                  <span className="text-[10px] tabular-nums font-semibold leading-tight">{max}°</span>
-                  <span className="text-[9px] tabular-nums text-muted-foreground leading-tight">{min}°</span>
-                  <span className="text-[8px] text-muted-foreground leading-tight truncate max-w-full px-0.5">{descFor(data.daily.weather_code[i])}</span>
+                <div key={t} className="flex flex-col items-center gap-0.5 rounded-lg py-1.5 bg-muted/20">
+                  <span className="text-[9px] uppercase font-medium text-muted-foreground/60">{day}</span>
+                  <Icon className="h-3.5 w-3.5 text-accent/75" />
+                  <span className="text-[10px] tabular-nums font-semibold leading-tight text-foreground">{max}°</span>
+                  <span className="text-[9px] tabular-nums text-muted-foreground/55 leading-tight">{min}°</span>
                 </div>
               );
             })}

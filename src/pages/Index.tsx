@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import {
   FileText, CheckCircle2, Clock, XCircle, Package, Cog, ChevronDown, ChevronUp,
-  Plus, Users, Palette, LayoutList, CalendarDays, Inbox, TrendingUp, PieChart as PieIcon,
+  Plus, Users, Palette, LayoutList, CalendarDays, Inbox, TrendingUp, PieChart as PieIcon, PiggyBank,
 } from "lucide-react";
 import { WeatherWidget } from "@/modules/commercial/dashboard";
 import { fetchCatalogo } from "@/lib/orcamentoQueries";
@@ -236,11 +236,14 @@ const Index = () => {
 
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between pb-6 border-b border-border">
           <div>
+            <div className="flex items-center gap-1.5 mb-2.5">
+              <PiggyBank className="h-3.5 w-3.5 text-accent" /><span className="text-[10px] font-semibold uppercase tracking-wider text-accent/80">Inteligência Comercial Agro</span>
+            </div>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/45 font-medium mb-1">{dateLabel}</p>
             <h1 className="text-xl font-bold text-foreground tracking-tight leading-none">
               {greeting}{firstName && `, ${firstName}`}
             </h1>
-            <p className="mt-1 text-xs text-muted-foreground/70">Biotecnologia aplicada ao agropecuário</p>
+            <p className="mt-1 text-xs text-muted-foreground/60">Suinocultura · Bovinos · Equinos · Biotecnologia</p>
           </div>
           <div className="flex gap-7 sm:pb-0.5 shrink-0">
             <div>
@@ -329,7 +332,7 @@ const Index = () => {
         </Sec>
 
         <Sec label="Clima Operacional" description="condições para visitas e operações de campo">
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="rounded-xl border border-accent/20 bg-accent/5 overflow-hidden">
             <WeatherWidget />
           </div>
         </Sec>
@@ -337,9 +340,9 @@ const Index = () => {
         <Sec label="Operações Comerciais">
           <div className="grid gap-3 grid-cols-2 md:grid-cols-3">
             {[
-              { to: "/agenda", icon: CalendarDays, title: "Agenda", stats: [{ label: "Agendados", v: agendaStats.agendados },{ label: "Concluídos", v: agendaStats.concluidos },{ label: "Hoje", v: agendaStats.hoje }]},
-              { to: "/catalogo", icon: LayoutList, title: "Catálogo", stats: [{ label: "Total", v: catalogoStats.total },{ label: "Ativos", v: catalogoStats.ativos },{ label: "Categ.", v: catalogoStats.categorias }]},
-              { to: "/clientes", icon: Users, title: "Clientes", stats: [{ label: "Total", v: clientesStats.total },{ label: "Ativos", v: clientesStats.ativos },{ label: "Cidades", v: clientesStats.cidades }]},
+              { to: "/agenda", icon: CalendarDays, title: "Agenda", subtitle: "Visitas Técnicas · Campo", stats: [{ label: "Agendadas", v: agendaStats.agendados },{ label: "Concluídas", v: agendaStats.concluidos },{ label: "Hoje", v: agendaStats.hoje }]},
+              { to: "/catalogo", icon: LayoutList, title: "Catálogo", subtitle: "Produtos · Serviços · Aditivos", stats: [{ label: "Itens", v: catalogoStats.total },{ label: "Ativos", v: catalogoStats.ativos },{ label: "Categ.", v: catalogoStats.categorias }]},
+              { to: "/clientes", icon: Users, title: "Clientes", subtitle: "Propriedades · Produtores", stats: [{ label: "Total", v: clientesStats.total },{ label: "Ativos", v: clientesStats.ativos },{ label: "Cidades", v: clientesStats.cidades }]},
             ].map((card) => (
               <Link key={card.to} to={card.to}
                 className="group block rounded-xl border border-border bg-card p-4 hover:border-primary/30 hover:shadow-sm transition-all duration-150"
@@ -348,7 +351,7 @@ const Index = () => {
                   <div className="h-6 w-6 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors shrink-0">
                     <card.icon className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <p className="text-[12px] font-semibold text-foreground">{card.title}</p>
+                  <div><p className="text-[12px] font-semibold text-foreground leading-none">{card.title}</p><p className="text-[9px] text-muted-foreground/55 mt-0.5">{card.subtitle}</p></div>
                 </div>
                 <dl className="grid grid-cols-3 gap-1.5">
                   {card.stats.map(({ label, v }) => (
