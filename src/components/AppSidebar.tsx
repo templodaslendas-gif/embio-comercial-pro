@@ -4,6 +4,8 @@ import {
   LayoutDashboard,
   FileText,
   Users,
+  UserCheck,
+  CalendarDays,
   BookOpen,
   Headphones,
   Droplets,
@@ -53,9 +55,10 @@ export function AppSidebar() {
 
   const mainMenuItems = [
     { title: t("sidebar.dashboard"), url: "/", icon: LayoutDashboard },
-    { title: t("sidebar.newQuote"), url: "/novo-orcamento", icon: FileText },
-    { title: "Clientes", url: "/clientes", icon: Users },
+    { title: "Clientes", url: "/clientes", icon: UserCheck },
     { title: "Catálogo", url: "/catalogo", icon: LayoutList },
+    { title: "Agenda", url: "/agenda", icon: CalendarDays },
+    { title: t("sidebar.newQuote"), url: "/novo-orcamento", icon: FileText },
     { title: t("sidebar.myClients"), url: "/meus-clientes", icon: Users },
   ];
 

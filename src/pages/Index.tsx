@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   FileText, CheckCircle2, Clock, XCircle, Package, Cog, ChevronDown, ChevronUp,
   Plus, Users, Palette, BookOpen, TrendingUp, BarChart3, PieChart as PieIcon, Inbox,
-  LayoutList,
+  LayoutList, CalendarDays,
 } from "lucide-react";
 import { WeatherWidget } from "@/modules/commercial/dashboard";
 import { fetchCatalogo } from "@/lib/orcamentoQueries";
 import { fetchClientes } from "@/lib/clientesQueries";
+import { fetchServicos } from "@/lib/agendaQueries";
 import {
   AreaChart, Area, XAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -229,6 +230,12 @@ const Index = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: servicosData = [] } = useQuery({
+    queryKey: ["servicos"],
+    queryFn: fetchServicos,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const catalogoStats = useMemo(() => ({
     total: catalogoItens.length,
     ativos: catalogoItens.filter((i) => i.ativo).length,
@@ -240,6 +247,13 @@ const Index = () => {
     ativos: clientesData.filter((c) => c.status === "ativo").length,
     cidades: new Set(clientesData.map((c) => c.cidade).filter(Boolean)).size,
   }), [clientesData]);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const agendaStats = useMemo(() => ({
+    agendados: servicosData.filter((s) => s.status === "agendado").length,
+    concluidos: servicosData.filter((s) => s.status === "concluido").length,
+    hoje: servicosData.filter((s) => s.status === "agendado" && s.data === today).length,
+  }), [servicosData, today]);
 
   const premiumCard =
     "border border-border/40 rounded-3xl bg-card/70 backdrop-blur-xl shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)] hover:shadow-[0_14px_40px_-12px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 transition-all duration-300";
@@ -417,8 +431,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* WEATHER + CATÁLOGO + CLIENTES */}
-        <section className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in" style={{ animationDelay: "100ms" }}>
+        {/* WEATHER + CATÁLOGO + CLIENTES + AGENDA */}
+        <section className="grid gap-5 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 animate-fade-in" style={{ animationDelay: "100ms" }}>
           <WeatherWidget />
           <Link
             to="/catalogo"
@@ -473,6 +487,34 @@ const Index = () => {
               <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
                 <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.cidades} /></p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">Cidades</p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            to="/agenda"
+            className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl p-4 hover:border-primary/30 hover:bg-card/90 transition-all duration-300 group block"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <CalendarDays className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Agenda</p>
+                <p className="text-[11px] text-muted-foreground">Visitas e compromissos</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.agendados} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Agendados</p>
+              </div>
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.concluidos} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Concluídos</p>
+              </div>
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.hoje} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Hoje</p>
               </div>
             </div>
           </Link>
