@@ -24,6 +24,7 @@ import Propulsor5CV from "./pages/propulsores/Propulsor5CV";
 import Propulsor75CV from "./pages/propulsores/Propulsor75CV";
 import Propulsor10CV from "./pages/propulsores/Propulsor10CV";
 import Catalogo from "./pages/Catalogo";
+import Clientes from "./pages/Clientes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
                         <Route path="/novo-orcamento" element={<NovoOrcamento />} />
                         <Route path="/meus-clientes" element={<MeusClientes />} />
                         <Route path="/catalogo" element={<Catalogo />} />
+                        <Route path="/clientes" element={<Clientes />} />
                         <Route path="/instrucoes" element={<InstrucoesPreparo />} />
                         <Route path="/configuracoes-marca" element={<ConfiguracoesMarca />} />
                         <Route path="/produtos/embio-3100" element={<Embio3100 />} />

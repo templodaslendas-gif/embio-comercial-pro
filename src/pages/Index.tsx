@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { WeatherWidget } from "@/modules/commercial/dashboard";
 import { fetchCatalogo } from "@/lib/orcamentoQueries";
+import { fetchClientes } from "@/lib/clientesQueries";
 import {
   AreaChart, Area, XAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -222,11 +223,23 @@ const Index = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: clientesData = [] } = useQuery({
+    queryKey: ["clientes"],
+    queryFn: fetchClientes,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const catalogoStats = useMemo(() => ({
     total: catalogoItens.length,
     ativos: catalogoItens.filter((i) => i.ativo).length,
     categorias: new Set(catalogoItens.map((i) => i.categoria).filter(Boolean)).size,
   }), [catalogoItens]);
+
+  const clientesStats = useMemo(() => ({
+    total: clientesData.length,
+    ativos: clientesData.filter((c) => c.status === "ativo").length,
+    cidades: new Set(clientesData.map((c) => c.cidade).filter(Boolean)).size,
+  }), [clientesData]);
 
   const premiumCard =
     "border border-border/40 rounded-3xl bg-card/70 backdrop-blur-xl shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)] hover:shadow-[0_14px_40px_-12px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 transition-all duration-300";
@@ -279,8 +292,8 @@ const Index = () => {
   const quickActions = [
     { to: "/novo-orcamento", label: "Novo orçamento", icon: Plus },
     { to: "/clientes", label: "Clientes", icon: Users },
+    { to: "/catalogo", label: "Catálogo", icon: LayoutList },
     { to: "/configuracoes-marca", label: "Marca", icon: Palette },
-    { to: "/instrucoes-preparo", label: "Preparo", icon: BookOpen },
   ];
 
   const metricCards = [
@@ -404,8 +417,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* WEATHER + CATÁLOGO STATS */}
-        <section className="grid gap-5 grid-cols-1 sm:grid-cols-2 animate-fade-in" style={{ animationDelay: "100ms" }}>
+        {/* WEATHER + CATÁLOGO + CLIENTES */}
+        <section className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in" style={{ animationDelay: "100ms" }}>
           <WeatherWidget />
           <Link
             to="/catalogo"
@@ -432,6 +445,34 @@ const Index = () => {
               <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
                 <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.categorias} /></p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">Categorias</p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            to="/clientes"
+            className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl p-4 hover:border-primary/30 hover:bg-card/90 transition-all duration-300 group block"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Users className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Clientes</p>
+                <p className="text-[11px] text-muted-foreground">Base de clientes comerciais</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.total} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Total</p>
+              </div>
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.ativos} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Ativos</p>
+              </div>
+              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
+                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.cidades} /></p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Cidades</p>
               </div>
             </div>
           </Link>

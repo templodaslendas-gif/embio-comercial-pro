@@ -54,8 +54,9 @@ export function AppSidebar() {
   const mainMenuItems = [
     { title: t("sidebar.dashboard"), url: "/", icon: LayoutDashboard },
     { title: t("sidebar.newQuote"), url: "/novo-orcamento", icon: FileText },
-    { title: t("sidebar.myClients"), url: "/meus-clientes", icon: Users },
+    { title: "Clientes", url: "/clientes", icon: Users },
     { title: "Catálogo", url: "/catalogo", icon: LayoutList },
+    { title: t("sidebar.myClients"), url: "/meus-clientes", icon: Users },
   ];
 
   const produtoItems = [
