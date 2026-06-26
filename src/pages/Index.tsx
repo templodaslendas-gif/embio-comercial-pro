@@ -234,6 +234,7 @@ const Index = () => {
     queryKey: ["servicos"],
     queryFn: fetchServicos,
     staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 
   const catalogoStats = useMemo(() => ({
@@ -256,7 +257,7 @@ const Index = () => {
   }), [servicosData, today]);
 
   const premiumCard =
-    "border border-border/40 rounded-3xl bg-card/70 backdrop-blur-xl shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)] hover:shadow-[0_14px_40px_-12px_hsl(var(--primary)/0.25)] hover:-translate-y-0.5 transition-all duration-300";
+    "border border-border rounded-2xl bg-card shadow-sm hover:shadow-md transition-shadow duration-200";
 
   if (loading) {
     return (
@@ -268,12 +269,12 @@ const Index = () => {
         </div>
         <div className="grid gap-5 grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-36 rounded-3xl border border-border/40 bg-card/60 backdrop-blur animate-pulse" />
+            <div key={i} className="h-36 rounded-2xl border border-border bg-muted/30 animate-pulse" />
           ))}
         </div>
         <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
-          <div className="h-64 rounded-3xl border border-border/40 bg-card/60 backdrop-blur animate-pulse" />
-          <div className="h-64 rounded-3xl border border-border/40 bg-card/60 backdrop-blur animate-pulse" />
+          <div className="h-64 rounded-2xl border border-border bg-muted/30 animate-pulse" />
+          <div className="h-64 rounded-2xl border border-border bg-muted/30 animate-pulse" />
         </div>
       </div>
     );
@@ -311,10 +312,10 @@ const Index = () => {
   ];
 
   const metricCards = [
-    { id: "feitos", label: t("dashboard.quotesMade"), value: total, icon: FileText, tint: "primary" as const },
-    { id: "fechados", label: t("dashboard.approved"), value: fechados.length, icon: CheckCircle2, tint: "primary" as const },
-    { id: "aberto", label: t("dashboard.open"), value: emAberto.length, icon: Clock, tint: "accent" as const },
-    { id: "finalizados", label: t("dashboard.finished"), value: finalizados.length, icon: XCircle, tint: "muted" as const },
+    { id: "feitos", label: t("dashboard.quotesMade"), value: total, icon: FileText },
+    { id: "fechados", label: t("dashboard.approved"), value: fechados.length, icon: CheckCircle2 },
+    { id: "aberto", label: t("dashboard.open"), value: emAberto.length, icon: Clock },
+    { id: "finalizados", label: t("dashboard.finished"), value: finalizados.length, icon: XCircle },
   ];
 
   const expandedListFor = (id: string) => {
@@ -338,19 +339,6 @@ const Index = () => {
 
   return (
     <div className="relative space-y-8 max-w-6xl mx-auto">
-      {/* Decorative background */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-32 w-[420px] h-[420px] rounded-full bg-accent/15 blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.35]"
-          style={{
-            background:
-              "radial-gradient(1200px 600px at 50% -100px, hsl(var(--primary) / 0.06), transparent 60%)",
-          }}
-        />
-      </div>
-
       {/* Watermark logo */}
       {branding.logo_url && (
         <div
@@ -367,43 +355,31 @@ const Index = () => {
 
       <div className="relative z-10 space-y-8">
         {/* HERO */}
-        <section className="animate-fade-in">
-          <div className={`${premiumCard} p-5 sm:p-7`}>
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-                  {greeting}{firstName ? `, ${firstName}` : ""} <span aria-hidden>👋</span>
-                </p>
-                <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-                  Painel de Orçamentos
-                </h1>
-                <p className="text-muted-foreground mt-1.5 text-sm">
-                  Acompanhe performance, aprovações e movimentações comerciais
-                </p>
-                <p className="mt-2 text-[11px] uppercase tracking-wider text-muted-foreground/70">
-                  {dateLabel}
-                </p>
+        <section className="animate-fade-in pb-6 border-b border-border">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-1.5">
+                {dateLabel}
+              </p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                {greeting}{firstName ? `, ${firstName}` : ""}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Painel comercial · orçamentos, clientes e agenda
+              </p>
+            </div>
+            <div className="flex gap-6 sm:gap-8 shrink-0 pt-1 sm:pt-0 sm:pb-0.5">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Orçamentos</p>
+                <p className="text-2xl font-bold text-foreground tabular-nums mt-0.5"><Metric value={total} /></p>
               </div>
-
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 sm:min-w-[360px]">
-                <div className="rounded-2xl bg-background/50 border border-border/40 p-3 sm:p-4">
-                  <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground">Orçamentos</p>
-                  <p className="mt-1 text-lg sm:text-2xl font-bold text-foreground tabular-nums">
-                    <Metric value={total} />
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-background/50 border border-border/40 p-3 sm:p-4">
-                  <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground">Movimentado</p>
-                  <p className="mt-1 text-sm sm:text-lg font-bold text-foreground tabular-nums truncate">
-                    {moneyFmt.format(valorMovimentado)}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-background/50 border border-border/40 p-3 sm:p-4">
-                  <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground">Aprovação</p>
-                  <p className="mt-1 text-lg sm:text-2xl font-bold text-foreground tabular-nums">
-                    <Metric value={taxaAprovacao} />%
-                  </p>
-                </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Movimentado</p>
+                <p className="text-xl font-bold text-foreground tabular-nums mt-0.5 max-w-[120px] truncate">{moneyFmt.format(valorMovimentado)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Aprovação</p>
+                <p className="text-2xl font-bold text-foreground tabular-nums mt-0.5"><Metric value={taxaAprovacao} />%</p>
               </div>
             </div>
           </div>
@@ -411,137 +387,136 @@ const Index = () => {
 
         {/* QUICK ACTIONS */}
         <section className="animate-fade-in" style={{ animationDelay: "60ms" }}>
-          <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3 px-1">
+          <h2 className="text-[11px] uppercase tracking-wider text-muted-foreground/60 font-semibold mb-3">
             Ações Rápidas
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {quickActions.map((a, i) => (
+          <div className="flex flex-wrap gap-2">
+            {quickActions.map((a) => (
               <Link
                 key={a.to}
                 to={a.to}
-                className="group flex items-center gap-2.5 rounded-2xl bg-card/60 backdrop-blur border border-border/40 hover:border-primary/40 hover:bg-card/80 px-4 py-3 transition-all duration-300 animate-fade-in"
-                style={{ animationDelay: `${80 + i * 60}ms` }}
+                className="flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground hover:border-primary/50 hover:bg-muted/40 transition-colors"
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                  <a.icon className="h-4 w-4 text-primary" />
-                </span>
-                <span className="text-sm font-medium text-foreground truncate">{a.label}</span>
+                <a.icon className="h-4 w-4 text-muted-foreground" />
+                {a.label}
               </Link>
             ))}
           </div>
         </section>
 
-        {/* WEATHER + CATÁLOGO + CLIENTES + AGENDA */}
-        <section className="grid gap-5 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 animate-fade-in" style={{ animationDelay: "100ms" }}>
-          <WeatherWidget />
-          <Link
-            to="/catalogo"
-            className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl p-4 hover:border-primary/30 hover:bg-card/90 transition-all duration-300 group block"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <LayoutList className="h-4 w-4 text-primary" />
+        {/* VISÃO COMERCIAL */}
+        <section className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <h2 className="text-[11px] uppercase tracking-wider text-muted-foreground/60 font-semibold mb-3">
+            Visão Comercial
+          </h2>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 xl:grid-cols-4">
+            <Link
+              to="/catalogo"
+              className="rounded-2xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all duration-200 group block"
+            >
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors shrink-0">
+                  <LayoutList className="h-4 w-4 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground leading-tight">Catálogo</p>
+                  <p className="text-[11px] text-muted-foreground">Produtos e serviços</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Catálogo de Itens</p>
-                <p className="text-[11px] text-muted-foreground">Produtos e serviços</p>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.total} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Total</p>
+                </div>
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.ativos} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Ativos</p>
+                </div>
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.categorias} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Categ.</p>
+                </div>
               </div>
+            </Link>
+            <Link
+              to="/clientes"
+              className="rounded-2xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all duration-200 group block"
+            >
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors shrink-0">
+                  <Users className="h-4 w-4 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground leading-tight">Clientes</p>
+                  <p className="text-[11px] text-muted-foreground">Base comercial</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.total} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Total</p>
+                </div>
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.ativos} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Ativos</p>
+                </div>
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.cidades} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Cidades</p>
+                </div>
+              </div>
+            </Link>
+            <Link
+              to="/agenda"
+              className="rounded-2xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all duration-200 group block"
+            >
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors shrink-0">
+                  <CalendarDays className="h-4 w-4 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground leading-tight">Agenda</p>
+                  <p className="text-[11px] text-muted-foreground">Visitas e compromissos</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.agendados} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Agend.</p>
+                </div>
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.concluidos} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Concl.</p>
+                </div>
+                <div className="rounded-lg bg-muted/40 p-2 text-center">
+                  <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.hoje} /></p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Hoje</p>
+                </div>
+              </div>
+            </Link>
+            <div className="sm:col-span-3 xl:col-span-1">
+              <WeatherWidget />
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.total} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Total</p>
-              </div>
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.ativos} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Ativos</p>
-              </div>
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={catalogoStats.categorias} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Categorias</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            to="/clientes"
-            className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl p-4 hover:border-primary/30 hover:bg-card/90 transition-all duration-300 group block"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <Users className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Clientes</p>
-                <p className="text-[11px] text-muted-foreground">Base de clientes comerciais</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.total} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Total</p>
-              </div>
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.ativos} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Ativos</p>
-              </div>
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={clientesStats.cidades} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Cidades</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            to="/agenda"
-            className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl p-4 hover:border-primary/30 hover:bg-card/90 transition-all duration-300 group block"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <CalendarDays className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Agenda</p>
-                <p className="text-[11px] text-muted-foreground">Visitas e compromissos</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.agendados} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Agendados</p>
-              </div>
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.concluidos} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Concluídos</p>
-              </div>
-              <div className="rounded-lg bg-background/50 border border-border/30 p-2 text-center">
-                <p className="text-xl font-bold text-foreground tabular-nums"><Metric value={agendaStats.hoje} /></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Hoje</p>
-              </div>
-            </div>
-          </Link>
+          </div>
         </section>
 
         {/* METRIC CARDS */}
-        <section className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4">
-          {metricCards.map((m, i) => {
-            const tintBg =
-              m.tint === "primary" ? "bg-gradient-to-br from-primary/15 to-accent/10"
-              : m.tint === "accent" ? "bg-gradient-to-br from-accent/20 to-primary/10"
-              : "bg-muted";
-            const tintFg =
-              m.tint === "primary" ? "text-primary"
-              : m.tint === "accent" ? "text-accent-foreground"
-              : "text-muted-foreground";
-            return (
+        <section className="animate-fade-in" style={{ animationDelay: "120ms" }}>
+          <h2 className="text-[11px] uppercase tracking-wider text-muted-foreground/60 font-semibold mb-3">
+            Orçamentos Embio
+          </h2>
+          <div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4">
+            {metricCards.map((m, i) => (
               <Card
                 key={m.id}
-                className={`${premiumCard} cursor-pointer animate-fade-in group`}
-                style={{ animationDelay: `${120 + i * 70}ms` }}
+                className={`${premiumCard} cursor-pointer group`}
+                style={{ animationDelay: `${140 + i * 60}ms` }}
                 onClick={() => toggleCard(m.id)}
               >
                 <CardContent className="p-4 sm:p-5">
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${tintBg} group-hover:scale-105 transition-transform`}>
-                      <m.icon className={`h-5 w-5 ${tintFg}`} />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted group-hover:bg-muted/60 transition-colors">
+                      <m.icon className="h-4 w-4 text-muted-foreground" />
                     </div>
                     {expandedCard === m.id
                       ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
@@ -551,25 +526,26 @@ const Index = () => {
                     <Metric value={m.value} />
                   </p>
                   <p className="text-xs text-muted-foreground mt-1.5 font-medium">{m.label}</p>
-                  <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground/80">
-                    <span className="text-muted-foreground/60">—</span>
-                    <span>Últimos 30 dias</span>
-                  </div>
+                  <p className="mt-1.5 text-[11px] text-muted-foreground/60">Últimos 30 dias</p>
                   {expandedCard === m.id && expandedListFor(m.id)}
                 </CardContent>
               </Card>
-            );
-          })}
+            ))}
+          </div>
         </section>
 
         {/* CHARTS */}
-        <section className="grid gap-5 grid-cols-1 md:grid-cols-2">
+        <section>
+          <h2 className="text-[11px] uppercase tracking-wider text-muted-foreground/60 font-semibold mb-3">
+            Análise
+          </h2>
+          <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
           <Card className={`${premiumCard} animate-fade-in`} style={{ animationDelay: "300ms" }}>
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                    <TrendingUp className="h-4 w-4 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-foreground">Evolução</p>
@@ -625,8 +601,8 @@ const Index = () => {
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                    <PieIcon className="h-4 w-4 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+                    <PieIcon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-foreground">Mix de Status</p>
@@ -680,15 +656,20 @@ const Index = () => {
               )}
             </CardContent>
           </Card>
+        </div>
         </section>
 
         {/* PRODUCTS & PROPULSORS */}
-        <section className="grid gap-5 grid-cols-1 md:grid-cols-2">
+        <section>
+          <h2 className="text-[11px] uppercase tracking-wider text-muted-foreground/60 font-semibold mb-3">
+            Produtos & Propulsores
+          </h2>
+          <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
           <Card className={`${premiumCard} cursor-pointer animate-fade-in group`} style={{ animationDelay: "440ms" }} onClick={() => toggleCard("produtos")}>
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-accent/10 group-hover:scale-105 transition-transform">
-                  <Package className="h-5 w-5 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted group-hover:bg-muted/60 transition-colors">
+                  <Package className="h-4 w-4 text-muted-foreground" />
                 </div>
                 {expandedCard === "produtos" ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
               </div>
@@ -719,8 +700,8 @@ const Index = () => {
           <Card className={`${premiumCard} cursor-pointer animate-fade-in group`} style={{ animationDelay: "510ms" }} onClick={() => toggleCard("propulsores")}>
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-accent/10 group-hover:scale-105 transition-transform">
-                  <Cog className="h-5 w-5 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted group-hover:bg-muted/60 transition-colors">
+                  <Cog className="h-4 w-4 text-muted-foreground" />
                 </div>
                 {expandedCard === "propulsores" ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
               </div>
@@ -747,6 +728,7 @@ const Index = () => {
               )}
             </CardContent>
           </Card>
+          </div>
         </section>
 
         <p className="text-[11px] text-muted-foreground/60 text-center pt-2">{t("dashboard.dataFooter")}</p>
