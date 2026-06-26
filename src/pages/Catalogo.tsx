@@ -27,6 +27,7 @@ import {
   Plus, Search, Pencil, Trash2, Copy, Tag, Package, LayoutList,
   Loader2, CheckCircle2, XCircle,
 } from "lucide-react";
+import { PremiumHeader } from "@/components/premium";
 import { toast } from "sonner";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -146,26 +147,18 @@ export default function Catalogo() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <LayoutList className="h-6 w-6 text-primary" />
-            Catálogo de Itens
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {isLoading
-              ? "Carregando..."
-              : itens.length > 0
-                ? `${itens.length} produto(s) · ${categorias.length} categoria(s) · ${itens.filter((i) => i.ativo).length} ativo(s)`
-                : "Gerencie seus produtos e serviços"}
-          </p>
-        </div>
-        <Button onClick={openNew} className="shrink-0">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Novo Item
-        </Button>
-      </div>
+      <PremiumHeader
+        icon={LayoutList}
+        badge="Módulo Comercial"
+        title="Catálogo de Itens"
+        subtitle={isLoading ? "Carregando..." : itens.length > 0 ? `${itens.length} item(ns) · ${categorias.length} categoria(s) · ${itens.filter((i) => i.ativo).length} ativo(s)` : "Cadastre produtos, aditivos ou serviços"}
+        action={
+          <Button onClick={openNew} className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Novo Item
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">

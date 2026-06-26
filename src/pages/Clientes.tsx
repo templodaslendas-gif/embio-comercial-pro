@@ -24,8 +24,9 @@ import {
 } from "@/components/ui/table";
 import {
   Plus, Search, Pencil, Trash2, Users, MapPin, Phone,
-  Loader2, CheckCircle2, XCircle,
+  Loader2, CheckCircle2, XCircle, UserCheck,
 } from "lucide-react";
+import { PremiumHeader } from "@/components/premium";
 import { toast } from "sonner";
 
 const defaultForm = {
@@ -125,26 +126,18 @@ export default function Clientes() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" />
-            Clientes
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {isLoading
-              ? "Carregando..."
-              : clientes.length > 0
-                ? `${clientes.length} cliente(s) · ${ativos} ativo(s) · ${cidades.length} cidade(s)`
-                : "Cadastre sua base de clientes comerciais"}
-          </p>
-        </div>
-        <Button onClick={openNew} className="shrink-0">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Novo Cliente
-        </Button>
-      </div>
+      <PremiumHeader
+        icon={UserCheck}
+        badge="Módulo Comercial"
+        title="Clientes"
+        subtitle={isLoading ? "Carregando..." : clientes.length > 0 ? `${clientes.length} cadastrado(s) · ${ativos} ativo(s) · ${cidades.length} cidade(s)` : "Cadastre sua base de clientes e produtores"}
+        action={
+          <Button onClick={openNew} className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Novo Cliente
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">

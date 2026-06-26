@@ -25,6 +25,7 @@ import {
   CalendarDays, Plus, Search, Pencil, Trash2, CheckCircle2, XCircle,
   Loader2, RefreshCw, Clock,
 } from "lucide-react";
+import { PremiumHeader } from "@/components/premium";
 import { toast } from "sonner";
 
 const TIPO_OPTIONS = ["visita comercial", "retorno", "entrega", "demonstração", "outro"];
@@ -166,22 +167,18 @@ export default function Agenda() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <CalendarDays className="h-6 w-6 text-primary" />
-            Agenda Comercial
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {isLoading ? "Carregando..." : `${agendados} agendado(s) · ${concluidos} concluído(s)`}
-          </p>
-        </div>
-        <Button onClick={openNew} className="shrink-0">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Novo Compromisso
-        </Button>
-      </div>
+      <PremiumHeader
+        icon={CalendarDays}
+        badge="Módulo Comercial"
+        title="Agenda Comercial"
+        subtitle={isLoading ? "Carregando..." : `${agendados} agendado(s) · ${concluidos} concluído(s) · visitas e atendimentos de campo`}
+        action={
+          <Button onClick={openNew} className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Novo Compromisso
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
