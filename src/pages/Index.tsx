@@ -52,10 +52,10 @@ function Metric({ value }: { value: number }) {
   return <>{useCountUp(value)}</>;
 }
 
-function Sec({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Sec({ label, description, children, className }: { label: string; description?: string; children: React.ReactNode; className?: string }) {
   return (
     <section className={cn("space-y-3", className)}>
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/45">{label}</p>
+      <div className="flex items-baseline gap-2.5"><p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/45">{label}</p>{description && <p className="text-[11px] text-muted-foreground/40">{description}</p>}</div>
       {children}
     </section>
   );
@@ -217,15 +217,9 @@ const Index = () => {
 
   if (loading) return (
     <div className="max-w-5xl mx-auto space-y-8 py-1 animate-pulse">
-      <div className="pb-6 border-b border-border space-y-2">
-        <div className="h-2.5 w-28 rounded-full bg-muted/50" /><div className="h-6 w-52 rounded-lg bg-muted/40" />
-      </div>
-      <div className="grid gap-5 grid-cols-1 md:grid-cols-[1fr_280px]">
-        <div className="h-56 rounded-xl border border-border bg-muted/25" /><div className="h-56 rounded-xl border border-border bg-muted/25" />
-      </div>
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-        {[1,2,3,4].map((i) => <div key={i} className="h-32 rounded-xl border border-border bg-muted/25" />)}
-      </div>
+      <div className="pb-6 border-b border-border space-y-2"><div className="h-2.5 w-28 rounded-full bg-muted/50" /><div className="h-6 w-52 rounded-lg bg-muted/40" /></div>
+      <div className="grid gap-5 grid-cols-1 md:grid-cols-[1fr_280px]"><div className="h-56 rounded-xl border border-border bg-muted/25" /><div className="h-56 rounded-xl border border-border bg-muted/25" /></div>
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">{[1,2,3,4].map((i) => <div key={i} className="h-32 rounded-xl border border-border bg-muted/25" />)}</div>
     </div>
   );
 
@@ -246,7 +240,7 @@ const Index = () => {
             <h1 className="text-xl font-bold text-foreground tracking-tight leading-none">
               {greeting}{firstName && `, ${firstName}`}
             </h1>
-            <p className="mt-1 text-xs text-muted-foreground/70">Painel comercial · Embio</p>
+            <p className="mt-1 text-xs text-muted-foreground/70">Biotecnologia aplicada ao agropecuário</p>
           </div>
           <div className="flex gap-7 sm:pb-0.5 shrink-0">
             <div>
@@ -334,8 +328,14 @@ const Index = () => {
           </div>
         </Sec>
 
-        <Sec label="Visão Operacional">
-          <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
+        <Sec label="Clima Operacional" description="condições para visitas e operações de campo">
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
+            <WeatherWidget />
+          </div>
+        </Sec>
+
+        <Sec label="Operações Comerciais">
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-3">
             {[
               { to: "/agenda", icon: CalendarDays, title: "Agenda", stats: [{ label: "Agendados", v: agendaStats.agendados },{ label: "Concluídos", v: agendaStats.concluidos },{ label: "Hoje", v: agendaStats.hoje }]},
               { to: "/catalogo", icon: LayoutList, title: "Catálogo", stats: [{ label: "Total", v: catalogoStats.total },{ label: "Ativos", v: catalogoStats.ativos },{ label: "Categ.", v: catalogoStats.categorias }]},
@@ -360,13 +360,10 @@ const Index = () => {
                 </dl>
               </Link>
             ))}
-            <div className="col-span-1">
-              <WeatherWidget />
-            </div>
           </div>
         </Sec>
 
-        <Sec label="Orçamentos Embio">
+        <Sec label="Orçamentos Técnicos">
           <div className="flex flex-wrap gap-2">
             {metricCards.map((m) => (
               <button

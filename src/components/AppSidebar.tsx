@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard, FileText, Users, UserCheck, CalendarDays,
   BookOpen, Headphones, Droplets, Package, Cog, ChevronRight,
-  FlaskConical, Flame, Rocket, Palette, LayoutList,
+  FlaskConical, Flame, Rocket, Palette, LayoutList, Wheat,
 } from "lucide-react";
 import { useBranding } from "@/hooks/useBranding";
 import { NavLink } from "@/components/NavLink";
@@ -47,19 +47,17 @@ export function AppSidebar() {
               className="h-7 w-7 rounded-md object-contain"
             />
           ) : (
-            <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
-              {branding.app_name?.charAt(0) || "E"}
+            <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+              <Wheat className="h-4 w-4 text-primary" />
             </div>
           )}
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-sidebar-foreground truncate leading-tight">
               {branding.app_name}
             </p>
-            {branding.slogan && (
-              <p className="text-[10px] text-sidebar-foreground/35 truncate leading-tight mt-0.5">
-                {branding.slogan}
-              </p>
-            )}
+            <p className="text-[10px] text-sidebar-foreground/35 truncate leading-tight mt-0.5">
+              {branding.slogan || "Biotecnologia · Agropecuária"}
+            </p>
           </div>
         </div>
       </SidebarHeader>
