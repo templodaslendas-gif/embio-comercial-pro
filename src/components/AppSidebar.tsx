@@ -190,6 +190,7 @@ export function AppSidebar() {
         <Divider />
 
         <SidebarGroup className="p-0">
+          <GroupLabel>Admin</GroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
               <SidebarMenuItem>

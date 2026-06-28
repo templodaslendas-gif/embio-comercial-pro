@@ -10,7 +10,6 @@ import {
   FileText, CheckCircle2, Clock, XCircle, Package, Cog, ChevronDown, ChevronUp,
   Plus, UserCheck, LayoutList, CalendarDays, Inbox, TrendingUp, PieChart as PieIconLucide, Wheat,
 } from "lucide-react";
-import { WeatherWidget } from "@/modules/commercial/dashboard";
 import { fetchCatalogo } from "@/lib/orcamentoQueries";
 import { fetchClientes } from "@/lib/clientesQueries";
 import { fetchServicos } from "@/lib/agendaQueries";
@@ -18,7 +17,7 @@ import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Ce
 import { cn } from "@/lib/utils";
 import {
   PremiumPage, PremiumSection, PremiumChartCard, PremiumEmptyState,
-  PremiumBadge, PremiumAction, useCountUp,
+  PremiumBadge, PremiumAction, PremiumWeather, useCountUp,
 } from "@/components/premium";
 
 interface Quote {
@@ -210,9 +209,7 @@ const Index = () => {
 
         {/* CLIMA */}
         <PremiumSection label="Clima Operacional" description="planejamento de visitas ao campo">
-          <div className="rounded-xl border border-accent/25 bg-gradient-to-br from-accent/5 to-card overflow-hidden">
-            <WeatherWidget />
-          </div>
+          <PremiumWeather />
         </PremiumSection>
 
         {/* MÓDULOS */}

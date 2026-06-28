@@ -7,3 +7,8 @@ export { PremiumEmptyState } from "./PremiumEmptyState";
 export { PremiumBadge } from "./PremiumBadge";
 export { PremiumAction } from "./PremiumAction";
 export { PremiumChartCard } from "./PremiumChartCard";
+export { PremiumButton } from "./PremiumButton";
+export { PremiumTable } from "./PremiumTable";
+export { PremiumDialog, PremiumConfirmDialog } from "./PremiumDialog";
+export { PremiumHero } from "./PremiumHero";
+export { PremiumWeather } from "./PremiumWeather";

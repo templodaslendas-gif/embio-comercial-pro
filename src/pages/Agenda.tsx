@@ -52,7 +52,8 @@ const weekStr  = () => {
   return d.toISOString().slice(0, 10);
 };
 const monthStr = () => {
-  const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + 1);
+  const d = new Date();
+  d.setMonth(d.getMonth() + 1, 0); // último dia do mês atual
   return d.toISOString().slice(0, 10);
 };
 
@@ -199,7 +200,7 @@ export default function Agenda() {
             <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="hoje">Hoje</SelectItem>
             <SelectItem value="semana">Próximos 7 dias</SelectItem>
-            <SelectItem value="mes">Próximo mês</SelectItem>
+            <SelectItem value="mes">Este mês</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -369,12 +370,15 @@ export default function Agenda() {
             </div>
             <div className="space-y-1.5">
               <Label>Cliente</Label>
-              <Select value={form.cliente_id} onValueChange={(v) => setForm({ ...form, cliente_id: v })}>
+              <Select
+                value={form.cliente_id || "__none__"}
+                onValueChange={(v) => setForm({ ...form, cliente_id: v === "__none__" ? "" : v })}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar cliente (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="__none__">Nenhum</SelectItem>
                   {clientes.filter((c) => c.status === "ativo").map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
                   ))}
