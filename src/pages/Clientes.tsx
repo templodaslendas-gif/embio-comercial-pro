@@ -26,7 +26,7 @@ import {
   Plus, Search, Pencil, Trash2, Users, MapPin, Phone,
   Loader2, CheckCircle2, XCircle, UserCheck,
 } from "lucide-react";
-import { PremiumHeader } from "@/components/premium";
+import { PremiumHeader, PremiumStat } from "@/components/premium";
 import { toast } from "sonner";
 
 const defaultForm = {
@@ -131,13 +131,22 @@ export default function Clientes() {
         badge="Módulo Comercial"
         title="Clientes"
         subtitle={isLoading ? "Carregando..." : clientes.length > 0 ? `${clientes.length} cadastrado(s) · ${ativos} ativo(s) · ${cidades.length} cidade(s)` : "Cadastre sua base de clientes e produtores"}
+        variant="gradient"
         action={
-          <Button onClick={openNew} className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+          <Button onClick={openNew} className="shrink-0 bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold">
             <Plus className="h-4 w-4 mr-1.5" />
             Novo Cliente
           </Button>
         }
       />
+
+      {!isLoading && (
+        <div className="grid grid-cols-3 gap-3">
+          <PremiumStat icon={Users} label="Total de Clientes" value={clientes.length} variant="blue" />
+          <PremiumStat icon={CheckCircle2} label="Clientes Ativos" value={ativos} variant="green" />
+          <PremiumStat icon={MapPin} label="Cidades" value={cidades.length} variant="default" />
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -257,7 +266,7 @@ export default function Clientes() {
                     <Badge
                       variant="outline"
                       className={c.status === "ativo"
-                        ? "bg-primary/8 text-primary border-primary/25 text-xs gap-1"
+                        ? "bg-accent/18 text-accent border-accent/35 text-xs gap-1 font-semibold"
                         : "bg-muted/50 text-muted-foreground border-border/50 text-xs gap-1"
                       }
                     >

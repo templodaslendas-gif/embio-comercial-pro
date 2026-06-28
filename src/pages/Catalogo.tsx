@@ -27,7 +27,7 @@ import {
   Plus, Search, Pencil, Trash2, Copy, Tag, Package, LayoutList,
   Loader2, CheckCircle2, XCircle,
 } from "lucide-react";
-import { PremiumHeader } from "@/components/premium";
+import { PremiumHeader, PremiumStat } from "@/components/premium";
 import { toast } from "sonner";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -152,13 +152,22 @@ export default function Catalogo() {
         badge="Módulo Comercial"
         title="Catálogo de Itens"
         subtitle={isLoading ? "Carregando..." : itens.length > 0 ? `${itens.length} item(ns) · ${categorias.length} categoria(s) · ${itens.filter((i) => i.ativo).length} ativo(s)` : "Cadastre produtos, aditivos ou serviços"}
+        variant="gradient"
         action={
-          <Button onClick={openNew} className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+          <Button onClick={openNew} className="shrink-0 bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold">
             <Plus className="h-4 w-4 mr-1.5" />
             Novo Item
           </Button>
         }
       />
+
+      {!isLoading && (
+        <div className="grid grid-cols-3 gap-3">
+          <PremiumStat icon={Package} label="Total de Itens" value={itens.length} variant="blue" />
+          <PremiumStat icon={CheckCircle2} label="Itens Ativos" value={itens.filter((i) => i.ativo).length} variant="green" />
+          <PremiumStat icon={Tag} label="Categorias" value={categorias.length} variant="default" />
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -260,7 +269,7 @@ export default function Catalogo() {
                   </TableCell>
                   <TableCell>
                     {item.categoria ? (
-                      <Badge variant="outline" className="text-xs font-normal gap-1">
+                      <Badge variant="outline" className="text-xs font-medium gap-1 bg-accent/12 text-accent border-accent/25">
                         <Tag className="h-2.5 w-2.5" />
                         {item.categoria}
                       </Badge>
@@ -272,13 +281,13 @@ export default function Catalogo() {
                     <span className="text-sm text-muted-foreground">{item.unidade || "—"}</span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="font-semibold text-sm tabular-nums">{brl(Number(item.valor_unitario))}</span>
+                    <span className="font-bold text-sm tabular-nums text-foreground">{brl(Number(item.valor_unitario))}</span>
                   </TableCell>
                   <TableCell className="text-center hidden md:table-cell">
                     <Badge
                       variant="outline"
                       className={item.ativo
-                        ? "bg-primary/8 text-primary border-primary/25 text-xs gap-1"
+                        ? "bg-accent/18 text-accent border-accent/35 text-xs gap-1 font-semibold"
                         : "bg-muted/50 text-muted-foreground border-border/50 text-xs gap-1"
                       }
                     >

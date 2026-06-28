@@ -16,16 +16,16 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 
 const nav =
-  "flex items-center gap-2.5 w-full rounded-md px-2.5 py-[7px] text-[13px] text-sidebar-foreground/55 transition-colors duration-150 hover:bg-sidebar-primary/10 hover:text-sidebar-primary";
-const navActive = "bg-sidebar-primary/14 text-sidebar-primary font-semibold";
+  "flex items-center gap-2.5 w-full rounded-md px-2.5 py-[7px] text-[13px] text-sidebar-foreground/70 transition-colors duration-150 hover:bg-sidebar-primary/12 hover:text-sidebar-foreground";
+const navActive = "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-sm";
 const subNav =
-  "flex items-center gap-2 w-full rounded-md px-2.5 py-[6px] text-[12px] text-sidebar-foreground/45 transition-colors duration-150 hover:bg-sidebar-primary/8 hover:text-sidebar-primary/80";
-const subNavActive = "text-sidebar-primary/85 font-medium";
+  "flex items-center gap-2 w-full rounded-md px-2.5 py-[6px] text-[12px] text-sidebar-foreground/55 transition-colors duration-150 hover:bg-sidebar-primary/10 hover:text-sidebar-primary";
+const subNavActive = "text-sidebar-primary font-medium";
 
 const Divider = () => <div className="mx-2.5 my-3 border-t border-border/30" />;
 
 const GroupLabel = ({ children }: { children: React.ReactNode }) => (
-  <SidebarGroupLabel className="text-[10px] px-2.5 py-1 uppercase tracking-widest text-sidebar-primary/40 font-bold">
+  <SidebarGroupLabel className="text-[10px] px-2.5 py-1 uppercase tracking-widest text-sidebar-primary/55 font-bold">
     {children}
   </SidebarGroupLabel>
 );

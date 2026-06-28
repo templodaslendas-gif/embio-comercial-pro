@@ -25,15 +25,15 @@ import {
   CalendarDays, Plus, Search, Pencil, Trash2, CheckCircle2, XCircle,
   Loader2, RefreshCw, Clock,
 } from "lucide-react";
-import { PremiumHeader } from "@/components/premium";
+import { PremiumHeader, PremiumStat } from "@/components/premium";
 import { toast } from "sonner";
 
 const TIPO_OPTIONS = ["visita comercial", "retorno", "entrega", "demonstração", "outro"];
 
 const STATUS_CFG: Record<string, { label: string; cls: string }> = {
-  agendado:  { label: "Agendado",  cls: "bg-amber-500/10 text-amber-700 border-amber-500/25" },
-  concluido: { label: "Concluído", cls: "bg-primary/8 text-primary border-primary/25" },
-  cancelado: { label: "Cancelado", cls: "bg-muted/50 text-muted-foreground border-border/50" },
+  agendado:  { label: "Agendado",  cls: "bg-amber-500/18 text-amber-700 border-amber-500/35 font-semibold" },
+  concluido: { label: "Concluído", cls: "bg-accent/18 text-accent border-accent/35 font-semibold" },
+  cancelado: { label: "Cancelado", cls: "bg-muted/60 text-muted-foreground border-border/60" },
 };
 
 const defaultForm = {
@@ -173,13 +173,22 @@ export default function Agenda() {
         badge="Módulo Comercial"
         title="Agenda Comercial"
         subtitle={isLoading ? "Carregando..." : `${agendados} agendado(s) · ${concluidos} concluído(s) · visitas e atendimentos de campo`}
+        variant="gradient"
         action={
-          <Button onClick={openNew} className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+          <Button onClick={openNew} className="shrink-0 bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold">
             <Plus className="h-4 w-4 mr-1.5" />
             Novo Compromisso
           </Button>
         }
       />
+
+      {!isLoading && (
+        <div className="grid grid-cols-3 gap-3">
+          <PremiumStat icon={Clock} label="Agendados" value={agendados} variant="orange" />
+          <PremiumStat icon={CheckCircle2} label="Concluídos" value={concluidos} variant="green" />
+          <PremiumStat icon={CalendarDays} label="Total de Visitas" value={servicos.length} variant="default" />
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">

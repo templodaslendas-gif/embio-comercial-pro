@@ -43,3 +43,32 @@ export function PremiumMetric({ value, label, suffix = "", size = "md", classNam
     </div>
   );
 }
+
+const statVariants = {
+  default: { card: "border border-border/60 bg-card shadow-[0_1px_3px_hsl(210_20%_20%/0.06)]", value: "text-foreground", label: "text-muted-foreground/60" },
+  green:   { card: "bg-gradient-to-br from-[hsl(120,55%,32%)] to-[hsl(140,50%,25%)] shadow-[0_4px_14px_hsl(120_55%_32%/0.3)]", value: "text-white", label: "text-white/60" },
+  blue:    { card: "bg-gradient-to-br from-[hsl(210,70%,22%)] to-[hsl(215,65%,17%)] shadow-[0_4px_14px_hsl(210_70%_22%/0.3)]", value: "text-white", label: "text-white/60" },
+  orange:  { card: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_4px_14px_hsl(38_92%_50%/0.3)]", value: "text-white", label: "text-white/60" },
+  teal:    { card: "bg-gradient-to-br from-teal-600 to-teal-700 shadow-[0_4px_14px_hsl(173_55%_40%/0.3)]", value: "text-white", label: "text-white/60" },
+} as const;
+
+interface PremiumStatProps {
+  label: string;
+  value: number;
+  icon?: React.ElementType;
+  variant?: keyof typeof statVariants;
+  suffix?: string;
+  className?: string;
+}
+
+export function PremiumStat({ label, value, icon: Icon, variant = "default", suffix = "", className }: PremiumStatProps) {
+  const count = useCountUp(value);
+  const s = statVariants[variant];
+  return (
+    <div className={cn("rounded-xl p-4", s.card, className)}>
+      {Icon && <Icon className={cn("h-4 w-4 mb-2.5 opacity-70", s.value)} />}
+      <p className={cn("text-3xl font-bold tabular-nums leading-none", s.value)}>{count}{suffix}</p>
+      <p className={cn("text-xs mt-1.5", s.label)}>{label}</p>
+    </div>
+  );
+}

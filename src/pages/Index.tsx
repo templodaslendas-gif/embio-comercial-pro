@@ -17,7 +17,7 @@ import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Ce
 import { cn } from "@/lib/utils";
 import {
   PremiumPage, PremiumSection, PremiumChartCard, PremiumEmptyState,
-  PremiumBadge, PremiumAction, PremiumWeather, useCountUp,
+  PremiumAction, PremiumWeather, useCountUp,
 } from "@/components/premium";
 
 interface Quote {
@@ -28,6 +28,13 @@ interface Quote {
 }
 
 const Num = ({ v }: { v: number }) => <>{useCountUp(v)}</>;
+
+const METRIC_CFG: Record<string, { card: string; icon: string; value: string; label: string }> = {
+  feitos:     { card: "bg-gradient-to-br from-[hsl(210,70%,22%)] to-[hsl(215,65%,18%)] shadow-[0_4px_14px_hsl(210_70%_22%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/55" },
+  fechados:   { card: "bg-gradient-to-br from-[hsl(120,55%,32%)] to-[hsl(140,50%,26%)] shadow-[0_4px_14px_hsl(120_55%_32%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/55" },
+  aberto:     { card: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_4px_14px_hsl(38_92%_50%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/55" },
+  finalizados:{ card: "border border-border/60 bg-card shadow-[0_1px_3px_hsl(210_20%_20%/0.06)]", icon: "text-muted-foreground/55", value: "text-foreground", label: "text-muted-foreground/50" },
+};
 
 const Index = () => {
   const { user } = useAuth();
@@ -120,9 +127,9 @@ const Index = () => {
   }, [quotes]);
 
   const statusMix = useMemo(() => [
-    { name: t("dashboard.statusApproved"), value: fechados.length, color: "hsl(var(--accent))" },
-    { name: t("dashboard.statusOpen"), value: emAberto.length, color: "hsl(var(--accent) / 0.4)" },
-    { name: t("dashboard.statusFinished"), value: finalizados.length, color: "hsl(var(--muted-foreground) / 0.35)" },
+    { name: t("dashboard.statusApproved"), value: fechados.length, color: "hsl(120, 55%, 38%)" },
+    { name: t("dashboard.statusOpen"), value: emAberto.length, color: "hsl(38, 92%, 50%)" },
+    { name: t("dashboard.statusFinished"), value: finalizados.length, color: "hsl(210, 20%, 72%)" },
   ], [fechados.length, emAberto.length, finalizados.length, t]);
 
   const { data: catalogoItens = [] } = useQuery({ queryKey: ["catalogo"], queryFn: fetchCatalogo, staleTime: 5 * 60 * 1000 });
@@ -185,22 +192,25 @@ const Index = () => {
       <div className="relative z-10 space-y-8">
 
         {/* HERO */}
-        <div className="relative overflow-hidden rounded-xl border border-border/60 bg-card px-6 py-5 shadow-[0_1px_3px_hsl(210_20%_20%/0.06)]">
-          <div className="absolute inset-y-0 left-0 w-[3px] bg-accent rounded-l-xl" />
-          <div className="pl-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[hsl(210,62%,14%)] via-[hsl(210,58%,17%)] to-[hsl(140,48%,22%)] px-6 py-6 shadow-md">
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1.5">
-              <PremiumBadge><Wheat className="h-3 w-3" />Inteligência Comercial Agro</PremiumBadge>
+              <div className="flex items-center gap-1.5">
+                <Wheat className="h-3.5 w-3.5 text-white/45" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/45">Inteligência Comercial Agro</span>
+              </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/40 font-medium capitalize">{dateLabel}</p>
-                <h1 className="text-xl font-bold text-foreground tracking-tight mt-0.5">{greeting}{firstName && `, ${firstName}`}</h1>
-                <p className="text-xs text-muted-foreground/55 mt-0.5">Suinocultura · Bovinos · Equinos · Biotecnologia</p>
+                <p className="text-[10px] uppercase tracking-widest text-white/30 font-medium capitalize">{dateLabel}</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight mt-0.5">{greeting}{firstName && `, ${firstName}`}</h1>
+                <p className="text-xs text-white/40 mt-0.5">Suinocultura · Bovinos · Equinos · Biotecnologia</p>
               </div>
             </div>
-            <div className="flex gap-6 shrink-0">
+            <div className="flex gap-8 shrink-0">
               {([{ v: total, l: "Orçamentos" }, { v: clientesStats.total, l: "Clientes" }, { v: agendaStats.agendados, l: "Visitas" }] as { v: number; l: string }[]).map(({ v, l }) => (
-                <div key={l}>
-                  <p className="text-[9px] uppercase tracking-wider text-muted-foreground/40 mb-0.5">{l}</p>
-                  <p className="text-[22px] font-bold tabular-nums leading-none text-foreground"><Num v={v} /></p>
+                <div key={l} className="text-right">
+                  <p className="text-[9px] uppercase tracking-wider text-white/30 mb-0.5">{l}</p>
+                  <p className="text-[26px] font-bold tabular-nums leading-none text-white"><Num v={v} /></p>
                 </div>
               ))}
             </div>
@@ -216,15 +226,15 @@ const Index = () => {
         <PremiumSection label="Módulos Comerciais">
           <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
             {[
-              { to: "/clientes", icon: UserCheck, title: "Clientes", subtitle: "Propriedades · Produtores", value: clientesStats.total, detail: `${clientesStats.ativos} ativos · ${clientesStats.cidades} cidades` },
-              { to: "/catalogo", icon: LayoutList, title: "Catálogo", subtitle: "Produtos · Serviços · Aditivos", value: catalogoStats.total, detail: `${catalogoStats.ativos} ativos · ${catalogoStats.categorias} categ.` },
-              { to: "/agenda", icon: CalendarDays, title: "Agenda", subtitle: "Visitas Técnicas · Campo", value: agendaStats.agendados, detail: `${agendaStats.concluidos} concluídas · ${agendaStats.hoje} hoje` },
-              { to: "/novo-orcamento", icon: FileText, title: "Orçamentos", subtitle: "Técnicos · Embio", value: total, detail: `${fechados.length} fechados · ${emAberto.length} abertos` },
+              { to: "/clientes", icon: UserCheck, title: "Clientes", subtitle: "Propriedades · Produtores", value: clientesStats.total, detail: `${clientesStats.ativos} ativos · ${clientesStats.cidades} cidades`, iconBg: "bg-[hsl(210,70%,22%)] text-white" },
+              { to: "/catalogo", icon: LayoutList, title: "Catálogo", subtitle: "Produtos · Serviços · Aditivos", value: catalogoStats.total, detail: `${catalogoStats.ativos} ativos · ${catalogoStats.categorias} categ.`, iconBg: "bg-accent text-white" },
+              { to: "/agenda", icon: CalendarDays, title: "Agenda", subtitle: "Visitas Técnicas · Campo", value: agendaStats.agendados, detail: `${agendaStats.concluidos} concluídas · ${agendaStats.hoje} hoje`, iconBg: "bg-amber-500 text-white" },
+              { to: "/novo-orcamento", icon: FileText, title: "Orçamentos", subtitle: "Técnicos · Embio", value: total, detail: `${fechados.length} fechados · ${emAberto.length} abertos`, iconBg: "bg-teal-600 text-white" },
             ].map((card) => (
-              <Link key={card.to} to={card.to} className="group block rounded-xl border border-border/60 bg-card p-4 transition-all duration-150 hover:border-accent/35 hover:shadow-md">
+              <Link key={card.to} to={card.to} className="group block rounded-xl border border-border/60 bg-card p-4 transition-all duration-150 hover:border-accent/35 hover:shadow-md hover:-translate-y-0.5">
                 <div className="flex items-center gap-2 mb-3.5">
-                  <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/15 transition-colors">
-                    <card.icon className="h-4 w-4 text-accent" />
+                  <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm", card.iconBg)}>
+                    <card.icon className="h-4 w-4" />
                   </div>
                   <div>
                     <p className="text-[12px] font-semibold text-foreground leading-none">{card.title}</p>
@@ -248,13 +258,13 @@ const Index = () => {
                     <AreaChart data={evolution} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
                       <defs>
                         <linearGradient id="aGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity={0.15} />
+                          <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity={0.4} />
                           <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="label" tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground) / 0.6)" }} axisLine={false} tickLine={false} interval={Math.ceil(evolution.length / 5)} />
                       <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 11 }} labelStyle={{ color: "hsl(var(--muted-foreground))" }} cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1 }} />
-                      <Area type="monotone" dataKey="count" stroke="hsl(var(--accent))" strokeWidth={1.5} fill="url(#aGrad)" dot={false} activeDot={{ r: 3, fill: "hsl(var(--accent))", strokeWidth: 0 }} />
+                      <Area type="monotone" dataKey="count" stroke="hsl(var(--accent))" strokeWidth={2} fill="url(#aGrad)" dot={false} activeDot={{ r: 4, fill: "hsl(var(--accent))", strokeWidth: 0 }} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -289,18 +299,26 @@ const Index = () => {
 
         {/* ORÇAMENTOS */}
         <PremiumSection label="Orçamentos Técnicos">
-          <div className="flex flex-wrap gap-2">
-            {metricCards.map((m) => (
-              <button key={m.id} onClick={() => toggle(m.id)} className={cn(
-                "flex items-center gap-2.5 rounded-lg border px-3.5 py-2 text-sm transition-all duration-150",
-                expandedCard === m.id ? "border-accent/30 bg-accent/8 shadow-sm" : "border-border/60 bg-card hover:border-accent/20 hover:bg-muted/20",
-              )}>
-                <m.icon className={cn("h-3.5 w-3.5 shrink-0", expandedCard === m.id ? "text-accent" : "text-muted-foreground")} />
-                <span className={cn("text-[17px] font-bold tabular-nums leading-none", expandedCard === m.id ? "text-accent" : "text-foreground")}><Num v={m.value} /></span>
-                <span className="text-[11px] text-muted-foreground">{m.label}</span>
-                {expandedCard === m.id ? <ChevronUp className="h-3 w-3 text-muted-foreground/60 ml-0.5" /> : <ChevronDown className="h-3 w-3 text-muted-foreground/40 ml-0.5" />}
-              </button>
-            ))}
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
+            {metricCards.map((m) => {
+              const cfg = METRIC_CFG[m.id];
+              return (
+                <button key={m.id} onClick={() => toggle(m.id)} className={cn(
+                  "rounded-xl p-4 text-left transition-all duration-150 hover:-translate-y-0.5 active:translate-y-0",
+                  cfg.card,
+                  expandedCard === m.id && "ring-2 ring-white/15 shadow-xl scale-[1.01]",
+                )}>
+                  <div className="flex items-center justify-between mb-3">
+                    <m.icon className={cn("h-4 w-4", cfg.icon)} />
+                    {expandedCard === m.id
+                      ? <ChevronUp className={cn("h-3.5 w-3.5", cfg.icon)} />
+                      : <ChevronDown className={cn("h-3.5 w-3.5 opacity-40", cfg.icon)} />}
+                  </div>
+                  <p className={cn("text-3xl font-bold tabular-nums leading-none", cfg.value)}><Num v={m.value} /></p>
+                  <p className={cn("text-xs mt-2", cfg.label)}>{m.label}</p>
+                </button>
+              );
+            })}
           </div>
           {expandedCard && ["feitos", "fechados", "aberto", "finalizados"].includes(expandedCard) && (
             <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
