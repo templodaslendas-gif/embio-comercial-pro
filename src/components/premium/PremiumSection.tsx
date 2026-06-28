@@ -10,12 +10,12 @@ interface PremiumSectionProps {
 
 export function PremiumSection({ label, description, action, children, className }: PremiumSectionProps) {
   return (
-    <section className={cn("space-y-3", className)}>
+    <section className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between">
-        <div className="flex items-baseline gap-2.5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-accent/65">{label}</p>
+        <div className="flex items-baseline gap-3">
+          <p className="text-sm font-bold uppercase tracking-wider text-accent/80">{label}</p>
           {description && (
-            <p className="text-[10px] text-muted-foreground/40">{description}</p>
+            <p className="text-xs text-muted-foreground/50">{description}</p>
           )}
         </div>
         {action}
