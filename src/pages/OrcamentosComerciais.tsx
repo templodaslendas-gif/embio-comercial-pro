@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchOrcamentos, fetchOrcamentoById, deleteOrcamento, updateOrcamentoStatus,
+  duplicateOrcamento,
   type OrcamentoComercial, type OrcamentoStatus,
 } from "@/lib/orcamentosComercialQueries";
 import { generateOrcamentoPdfComercial } from "@/lib/orcamentoPdfComercial";
@@ -21,23 +22,25 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MovimentacaoModal } from "@/components/financeiro/MovimentacaoModal";
 import { toast } from "sonner";
 import {
-  FileText, Plus, Search, TrendingUp, CheckCircle2,
-  MoreVertical, Pencil, Trash2, FileDown, XCircle, Clock, Loader2, DollarSign,
+  FileText, Plus, Search, TrendingUp, CheckCircle2, Eye,
+  MoreVertical, Pencil, Trash2, XCircle, Clock, Loader2,
+  DollarSign, Copy, MessageCircle, RotateCcw, FileDown,
 } from "lucide-react";
 
+const toNum = (v: any): number => parseFloat(String(v ?? 0)) || 0;
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const STATUS_CFG: Record<OrcamentoStatus, { label: string; cls: string }> = {
-  em_aberto:  { label: "Em aberto",  cls: "bg-amber-500/15 text-amber-700 border-amber-500/30" },
-  aprovado:   { label: "Aprovado",   cls: "bg-green-500/15 text-green-700 border-green-500/30" },
-  recusado:   { label: "Recusado",   cls: "bg-red-500/15 text-red-700 border-red-500/30" },
-  finalizado: { label: "Finalizado", cls: "bg-muted text-muted-foreground border-border/60" },
+  em_aberto:  { label: "Em aberto",  cls: "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-400" },
+  aprovado:   { label: "Aprovado",   cls: "bg-green-500/15 text-green-700 border-green-500/30 dark:text-green-400" },
+  recusado:   { label: "Recusado",   cls: "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-400" },
+  finalizado: { label: "Finalizado", cls: "bg-blue-500/15 text-blue-700 border-blue-500/30 dark:text-blue-400" },
 };
 
 export default function OrcamentosComerciais() {
@@ -48,6 +51,7 @@ export default function OrcamentosComerciais() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [deleteTarget, setDeleteTarget] = useState<OrcamentoComercial | null>(null);
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
+  const [duplicating, setDuplicating] = useState<string | null>(null);
   const [financeiroModal, setFinanceiroModal] = useState<OrcamentoComercial | null>(null);
 
   const { data: orcamentos = [], isLoading } = useQuery({
@@ -64,7 +68,7 @@ export default function OrcamentosComerciais() {
     });
   }, [orcamentos, search, filterStatus]);
 
-  const totalOrcado = useMemo(() => orcamentos.reduce((s, o) => s + Number(o.total), 0), [orcamentos]);
+  const totalOrcado = useMemo(() => orcamentos.reduce((s, o) => s + toNum(o.total), 0), [orcamentos]);
   const countAprovado = useMemo(
     () => orcamentos.filter((o) => o.status === "aprovado" || o.status === "finalizado").length,
     [orcamentos],
@@ -90,9 +94,9 @@ export default function OrcamentosComerciais() {
   const statusMut = useMutation({
     mutationFn: ({ id, status }: { id: string; status: OrcamentoStatus }) =>
       updateOrcamentoStatus(id, status),
-    onSuccess: () => {
+    onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: ["orcamentos"] });
-      toast.success("Status atualizado");
+      toast.success(`Status atualizado: ${STATUS_CFG[status].label}`);
     },
     onError: (e: any) => toast.error(e?.message ?? "Erro"),
   });
@@ -109,6 +113,29 @@ export default function OrcamentosComerciais() {
       toast.error(e?.message ?? "Erro ao gerar PDF");
     } finally {
       setPdfLoading(null);
+    }
+  };
+
+  const handleWhatsApp = (orc: OrcamentoComercial) => {
+    const num = orc.numero_orcamento ?? "";
+    const cliente = orc.cliente_nome ?? "";
+    const valor = brl(toNum(orc.total));
+    const msg = encodeURIComponent(
+      `Olá! Segue o orçamento${num ? ` ${num}` : ""}${cliente ? ` para ${cliente}` : ""} no valor de ${valor}. Qualquer dúvida, estou à disposição.`,
+    );
+    window.open(`https://wa.me/?text=${msg}`, "_blank");
+  };
+
+  const handleDuplicate = async (orc: OrcamentoComercial) => {
+    setDuplicating(orc.id);
+    try {
+      await duplicateOrcamento(orc.id);
+      qc.invalidateQueries({ queryKey: ["orcamentos"] });
+      toast.success("Proposta duplicada com sucesso");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao duplicar");
+    } finally {
+      setDuplicating(null);
     }
   };
 
@@ -132,29 +159,29 @@ export default function OrcamentosComerciais() {
 
       {!isLoading && (
         <div className="grid grid-cols-3 gap-3">
-          <PremiumStat icon={FileText}    label="Total de Propostas" value={orcamentos.length} variant="blue" />
-          <PremiumStat icon={CheckCircle2} label="Aprovadas"         value={countAprovado}     variant="green" />
-          <PremiumStat icon={TrendingUp}  label="Total Orçado"      value={brl(totalOrcado)}  variant="default" />
+          <PremiumStat icon={FileText}     label="Total de Propostas" value={orcamentos.length} variant="blue" />
+          <PremiumStat icon={CheckCircle2} label="Aprovadas"          value={countAprovado}     variant="green" />
+          <PremiumStat icon={TrendingUp}   label="Total Orçado"       value={brl(totalOrcado)}  variant="default" />
         </div>
       )}
 
       {/* Abas por status */}
       <Tabs value={filterStatus} onValueChange={setFilterStatus}>
         <TabsList className="flex h-auto flex-wrap gap-1 rounded-xl bg-muted/40 p-1">
-          {[
-            { value: "all",        label: "Todos",      count: counts.all },
-            { value: "em_aberto",  label: "Em aberto",  count: counts.em_aberto },
-            { value: "aprovado",   label: "Aprovados",  count: counts.aprovado },
-            { value: "recusado",   label: "Recusados",  count: counts.recusado },
-            { value: "finalizado", label: "Finalizados",count: counts.finalizado },
-          ].map(({ value, label, count }) => (
+          {([
+            { value: "all",        label: "Todos",       count: counts.all },
+            { value: "em_aberto",  label: "Em aberto",   count: counts.em_aberto },
+            { value: "aprovado",   label: "Aprovados",   count: counts.aprovado },
+            { value: "recusado",   label: "Recusados",   count: counts.recusado },
+            { value: "finalizado", label: "Finalizados", count: counts.finalizado },
+          ] as const).map(({ value, label, count }) => (
             <TabsTrigger
               key={value}
               value={value}
               className="gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
               {label}
-              <span className="inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-muted px-1 text-[10px] tabular-nums text-muted-foreground data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
+              <span className="inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-muted px-1 text-[10px] tabular-nums text-muted-foreground">
                 {count}
               </span>
             </TabsTrigger>
@@ -173,6 +200,7 @@ export default function OrcamentosComerciais() {
         />
       </div>
 
+      {/* Tabela */}
       <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl overflow-hidden shadow-sm">
         <Table>
           <TableHeader>
@@ -219,7 +247,7 @@ export default function OrcamentosComerciais() {
                     <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
                       {new Date(orc.created_at).toLocaleDateString("pt-BR")}
                     </TableCell>
-                    <TableCell className="text-right font-bold tabular-nums text-sm">{brl(Number(orc.total))}</TableCell>
+                    <TableCell className="text-right font-bold tabular-nums text-sm">{brl(toNum(orc.total))}</TableCell>
                     <TableCell className="text-center hidden md:table-cell">
                       <Badge variant="outline" className={`text-xs ${st.cls}`}>{st.label}</Badge>
                     </TableCell>
@@ -231,32 +259,61 @@ export default function OrcamentosComerciais() {
                               <MoreVertical className="h-3.5 w-3.5" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground font-normal py-1">
+                              {orc.numero_orcamento ?? "Proposta"}
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+
+                            {/* Ações principais */}
+                            <DropdownMenuItem onClick={() => handlePdf(orc)} disabled={pdfLoading === orc.id}>
+                              {pdfLoading === orc.id
+                                ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
+                                : <Eye className="h-3.5 w-3.5 mr-2" />}
+                              Visualizar PDF
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => navigate(`/orcamentos/${orc.id}`)}>
                               <Pencil className="h-3.5 w-3.5 mr-2" /> Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handlePdf(orc)} disabled={pdfLoading === orc.id}>
-                              {pdfLoading === orc.id
-                                ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
-                                : <FileDown className="h-3.5 w-3.5 mr-2" />}
-                              Baixar PDF
+                              <FileDown className="h-3.5 w-3.5 mr-2" /> Baixar PDF
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleWhatsApp(orc)}>
+                              <MessageCircle className="h-3.5 w-3.5 mr-2 text-green-600" /> Enviar WhatsApp
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDuplicate(orc)} disabled={duplicating === orc.id}>
+                              {duplicating === orc.id
+                                ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
+                                : <Copy className="h-3.5 w-3.5 mr-2" />}
+                              Duplicar
+                            </DropdownMenuItem>
+
                             <DropdownMenuSeparator />
-                            {orc.status !== "aprovado" && (
-                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "aprovado" })}>
-                                <CheckCircle2 className="h-3.5 w-3.5 mr-2 text-green-600" /> Marcar Aprovado
+                            <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground font-normal py-1">
+                              Alterar status
+                            </DropdownMenuLabel>
+
+                            {orc.status !== "em_aberto" && (
+                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "em_aberto" })}>
+                                <RotateCcw className="h-3.5 w-3.5 mr-2 text-amber-600" /> Em Aberto
                               </DropdownMenuItem>
                             )}
-                            {orc.status !== "recusado" && (
-                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "recusado" })}>
-                                <XCircle className="h-3.5 w-3.5 mr-2 text-red-600" /> Marcar Recusado
+                            {orc.status !== "aprovado" && (
+                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "aprovado" })}>
+                                <CheckCircle2 className="h-3.5 w-3.5 mr-2 text-green-600" /> Aprovado
                               </DropdownMenuItem>
                             )}
                             {orc.status !== "finalizado" && (
                               <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "finalizado" })}>
-                                <Clock className="h-3.5 w-3.5 mr-2" /> Finalizar
+                                <Clock className="h-3.5 w-3.5 mr-2 text-blue-600" /> Finalizado
                               </DropdownMenuItem>
                             )}
+                            {orc.status !== "recusado" && (
+                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "recusado" })}>
+                                <XCircle className="h-3.5 w-3.5 mr-2 text-red-600" /> Recusado
+                              </DropdownMenuItem>
+                            )}
+
                             {(orc.status === "aprovado" || orc.status === "finalizado") && (
                               <>
                                 <DropdownMenuSeparator />
@@ -265,8 +322,12 @@ export default function OrcamentosComerciais() {
                                 </DropdownMenuItem>
                               </>
                             )}
+
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(orc)}>
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => setDeleteTarget(orc)}
+                            >
                               <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -281,6 +342,7 @@ export default function OrcamentosComerciais() {
         </Table>
       </div>
 
+      {/* Confirmar exclusão */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -303,6 +365,8 @@ export default function OrcamentosComerciais() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal financeiro */}
       {financeiroModal && (
         <MovimentacaoModal
           open={!!financeiroModal}
@@ -310,7 +374,7 @@ export default function OrcamentosComerciais() {
           defaultTipo="entrada"
           defaultOrcamentoId={financeiroModal.id}
           defaultDescricao={`Proposta ${financeiroModal.numero_orcamento ?? ""} — ${financeiroModal.cliente_nome ?? ""}`}
-          defaultValor={Number(financeiroModal.total)}
+          defaultValor={toNum(financeiroModal.total)}
         />
       )}
     </div>

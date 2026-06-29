@@ -134,6 +134,27 @@ export async function deleteOrcamento(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function duplicateOrcamento(id: string): Promise<OrcamentoComercial> {
+  const full = await fetchOrcamentoById(id);
+  const draft: OrcamentoDraft = {
+    cliente_id: full.cliente_id,
+    cliente_nome: full.cliente_nome,
+    validade_dias: full.validade_dias,
+    forma_pagamento: full.forma_pagamento,
+    observacoes: full.observacoes,
+  };
+  const itens: OrcamentoItemDraft[] = full.itens.map((it, i) => ({
+    catalogo_item_id: it.catalogo_item_id,
+    nome_item: it.nome_item,
+    descricao: it.descricao,
+    unidade: it.unidade,
+    quantidade: Number(it.quantidade),
+    valor_unitario: Number(it.valor_unitario),
+    ordem: i,
+  }));
+  return createOrcamento(draft, itens);
+}
+
 export async function fetchFinanceiroMetrics(): Promise<FinanceiroMetrics> {
   const { data, error } = await (supabase as any)
     .from('orcamentos').select('status, total');
