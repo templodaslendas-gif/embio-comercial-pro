@@ -9,10 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   FileText, CheckCircle2, Clock, XCircle, Package, Cog, ChevronDown, ChevronUp,
   Plus, UserCheck, LayoutList, CalendarDays, Inbox, TrendingUp, PieChart as PieIconLucide,
+  Receipt, Landmark,
 } from "lucide-react";
 import { fetchCatalogo } from "@/lib/orcamentoQueries";
 import { fetchClientes } from "@/lib/clientesQueries";
 import { fetchServicos } from "@/lib/agendaQueries";
+import { fetchOrcamentos } from "@/lib/orcamentosComercialQueries";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { cn } from "@/lib/utils";
 import {
@@ -28,6 +30,7 @@ interface Quote {
 }
 
 const Num = ({ v }: { v: number }) => <>{useCountUp(v)}</>;
+const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const METRIC_CFG: Record<string, { card: string; icon: string; value: string; label: string }> = {
   feitos:     { card: "bg-gradient-to-br from-[hsl(210,70%,22%)] to-[hsl(215,65%,18%)] shadow-[0_4px_14px_hsl(210_70%_22%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/60" },
@@ -142,6 +145,14 @@ const Index = () => {
   const { data: catalogoItens = [] } = useQuery({ queryKey: ["catalogo"], queryFn: fetchCatalogo, staleTime: 5 * 60 * 1000 });
   const { data: clientesData = [] }  = useQuery({ queryKey: ["clientes"], queryFn: fetchClientes, staleTime: 5 * 60 * 1000 });
   const { data: servicosData = [] }  = useQuery({ queryKey: ["servicos"], queryFn: fetchServicos, staleTime: 5 * 60 * 1000, retry: false });
+  const { data: orcamentosData = [] } = useQuery({ queryKey: ["orcamentos"], queryFn: fetchOrcamentos });
+  const totalVendido = useMemo(
+    () =>
+      orcamentosData
+        .filter((o) => o.status === "aprovado" || o.status === "finalizado")
+        .reduce((s, o) => s + Number(o.total), 0),
+    [orcamentosData],
+  );
 
   const catalogoStats = useMemo(() => ({
     total:      catalogoItens.length,
@@ -200,12 +211,14 @@ const Index = () => {
 
         {/* 2. MÓDULOS COMERCIAIS */}
         <PremiumSection label="Módulos Comerciais">
-          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
             {[
               { to: "/clientes",       icon: UserCheck,    title: "Clientes",   subtitle: "Propriedades · Produtores",  value: clientesStats.total,   detail: `${clientesStats.ativos} ativos · ${clientesStats.cidades} cidades`,   iconBg: "bg-[hsl(210,70%,22%)] text-white" },
               { to: "/catalogo",       icon: LayoutList,   title: "Catálogo",   subtitle: "Produtos · Serviços",        value: catalogoStats.total,   detail: `${catalogoStats.ativos} ativos · ${catalogoStats.categorias} categ.`,  iconBg: "bg-accent text-white" },
               { to: "/agenda",         icon: CalendarDays, title: "Agenda",     subtitle: "Visitas Técnicas · Campo",   value: agendaStats.agendados, detail: `${agendaStats.concluidos} concluídas · ${agendaStats.hoje} hoje`,      iconBg: "bg-amber-500 text-white" },
               { to: "/novo-orcamento", icon: FileText,     title: "Orçamentos", subtitle: "Técnicos · Embio",           value: total,                 detail: `${fechados.length} fechados · ${emAberto.length} abertos`,            iconBg: "bg-teal-600 text-white" },
+              { to: "/orcamentos",     icon: Receipt,      title: "Propostas",  subtitle: "Comerciais · Negociações",   value: orcamentosData.length, detail: `${orcamentosData.filter(o => o.status === "aprovado" || o.status === "finalizado").length} aprovadas · ${brl(totalVendido)}`, iconBg: "bg-indigo-600 text-white" },
+              { to: "/financeiro",     icon: Landmark,     title: "Financeiro", subtitle: "Painel · Metas Comerciais",  value: orcamentosData.filter(o => o.status === "aprovado" || o.status === "finalizado").length, detail: `Total aprovado: ${brl(totalVendido)}`, iconBg: "bg-emerald-600 text-white" },
             ].map((card) => (
               <Link key={card.to} to={card.to} className="group block rounded-xl border border-border/60 bg-card p-5 transition-all duration-150 hover:border-accent/35 hover:shadow-md hover:-translate-y-0.5">
                 <div className="flex items-center gap-3 mb-4">

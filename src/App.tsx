@@ -26,6 +26,9 @@ import Propulsor10CV from "./pages/propulsores/Propulsor10CV";
 import Catalogo from "./pages/Catalogo";
 import Clientes from "./pages/Clientes";
 import Agenda from "./pages/Agenda";
+import OrcamentosComerciais  from "./pages/OrcamentosComerciais";
+import NovoOrcamentoComercial from "./pages/NovoOrcamentoComercial";
+import FinanceiroDashboard    from "./pages/FinanceiroDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +55,10 @@ const App = () => (
                         <Route path="/catalogo" element={<Catalogo />} />
                         <Route path="/clientes" element={<Clientes />} />
                         <Route path="/agenda" element={<Agenda />} />
+                        <Route path="/orcamentos"      element={<OrcamentosComerciais />} />
+                        <Route path="/orcamentos/novo" element={<NovoOrcamentoComercial />} />
+                        <Route path="/orcamentos/:id"  element={<NovoOrcamentoComercial />} />
+                        <Route path="/financeiro"      element={<FinanceiroDashboard />} />
                         <Route path="/instrucoes" element={<InstrucoesPreparo />} />
                         <Route path="/configuracoes-marca" element={<ConfiguracoesMarca />} />
                         <Route path="/produtos/embio-3100" element={<Embio3100 />} />

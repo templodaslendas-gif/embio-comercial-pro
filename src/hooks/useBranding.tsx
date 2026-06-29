@@ -14,6 +14,7 @@ export interface BrandingSettings {
   address: string | null;
   phone: string | null;
   phone_is_whatsapp: boolean;
+  meta_mensal: number | null;
 }
 
 const DEFAULTS: BrandingSettings = {
@@ -28,6 +29,7 @@ const DEFAULTS: BrandingSettings = {
   address: null,
   phone: null,
   phone_is_whatsapp: false,
+  meta_mensal: null,
 };
 
 interface BrandingContextValue {
@@ -129,7 +131,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     const { data } = await supabase
       .from("branding_settings")
-      .select("app_name, slogan, company_name, logo_url, primary_color, accent_color, background_color, cnpj, address, phone, phone_is_whatsapp")
+      .select("app_name, slogan, company_name, logo_url, primary_color, accent_color, background_color, cnpj, address, phone, phone_is_whatsapp, meta_mensal")
       .eq("user_id", user.id)
       .maybeSingle();
     const next = (data as BrandingSettings) ?? DEFAULTS;

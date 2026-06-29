@@ -4,6 +4,7 @@ import {
   LayoutDashboard, FileText, Users, UserCheck, CalendarDays,
   BookOpen, Headphones, Droplets, Package, Cog, ChevronRight,
   FlaskConical, Flame, Rocket, Palette, LayoutList, Wheat,
+  Receipt, Landmark,
 } from "lucide-react";
 import { useBranding } from "@/hooks/useBranding";
 import { NavLink } from "@/components/NavLink";
@@ -72,6 +73,8 @@ export function AppSidebar() {
                 { title: "Clientes", url: "/clientes", icon: UserCheck },
                 { title: "Catálogo", url: "/catalogo", icon: LayoutList },
                 { title: "Agenda", url: "/agenda", icon: CalendarDays },
+                { title: "Propostas", url: "/orcamentos", icon: Receipt },
+                { title: "Financeiro", url: "/financeiro", icon: Landmark },
               ].map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild>
