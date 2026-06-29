@@ -26,10 +26,11 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MovimentacaoModal } from "@/components/financeiro/MovimentacaoModal";
 import { toast } from "sonner";
 import {
   FileText, Plus, Search, TrendingUp, CheckCircle2,
-  MoreVertical, Pencil, Trash2, FileDown, XCircle, Clock, Loader2,
+  MoreVertical, Pencil, Trash2, FileDown, XCircle, Clock, Loader2, DollarSign,
 } from "lucide-react";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -49,6 +50,7 @@ export default function OrcamentosComerciais() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [deleteTarget, setDeleteTarget] = useState<OrcamentoComercial | null>(null);
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
+  const [financeiroModal, setFinanceiroModal] = useState<OrcamentoComercial | null>(null);
 
   const { data: orcamentos = [], isLoading } = useQuery({
     queryKey: ["orcamentos"],
@@ -237,6 +239,14 @@ export default function OrcamentosComerciais() {
                                 <Clock className="h-3.5 w-3.5 mr-2" /> Finalizar
                               </DropdownMenuItem>
                             )}
+                            {(orc.status === "aprovado" || orc.status === "finalizado") && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => setFinanceiroModal(orc)}>
+                                  <DollarSign className="h-3.5 w-3.5 mr-2 text-green-600" /> Gerar entrada financeira
+                                </DropdownMenuItem>
+                              </>
+                            )}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(orc)}>
                               <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir
@@ -275,6 +285,16 @@ export default function OrcamentosComerciais() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {financeiroModal && (
+        <MovimentacaoModal
+          open={!!financeiroModal}
+          onClose={() => setFinanceiroModal(null)}
+          defaultTipo="entrada"
+          defaultOrcamentoId={financeiroModal.id}
+          defaultDescricao={`Proposta ${financeiroModal.numero_orcamento ?? ""} — ${financeiroModal.cliente_nome ?? ""}`}
+          defaultValor={Number(financeiroModal.total)}
+        />
+      )}
     </div>
   );
 }
