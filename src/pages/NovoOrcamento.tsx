@@ -14,6 +14,8 @@ import { useBranding, generatedByText } from "@/hooks/useBranding";
 import { generateQuotePdf } from "@/lib/quotePdf";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCatalogo } from "@/lib/orcamentoQueries";
 import {
   FileText, MessageCircle, Loader2, Save, Plus, Trash2, Zap, FlaskConical, Truck, CreditCard, ClipboardList, Calendar, Hash, FileDown,
 } from "lucide-react";
@@ -33,10 +35,6 @@ interface AditivoEntry {
   quantidade: number | string;
 }
 
-const EMBIO_PRODUCTS = [
-  "Embio 3000", "Embio 3100", "Embio 5000+", "Embio 6000", "Embio 8000",
-];
-
 const emptyPropulsor = (): PropulsorEntry => ({
   modelo: "", voltagem: "", fase: "", caixaEletrica: "", aplicacao: "", quantidade: "",
 });
@@ -50,6 +48,12 @@ const NovoOrcamento = () => {
   const { branding } = useBranding();
 
   const dataAtual = useMemo(() => format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }), []);
+
+  const { data: catalogoItens = [] } = useQuery({
+    queryKey: ["catalogo"],
+    queryFn: fetchCatalogo,
+  });
+  const produtosEmbio = catalogoItens.filter((i) => i.ativo && i.categoria === "Produtos Embio");
 
   const [empresaName, setEmpresaName] = useState("");
   const [localidade, setLocalidade] = useState("");
@@ -391,7 +395,12 @@ const NovoOrcamento = () => {
                   <Select value={a.produto} onValueChange={(v) => updateAditivo(i, "produto", v)}>
                     <SelectTrigger className="h-10"><SelectValue placeholder={t("quote.productPlaceholder")} /></SelectTrigger>
                     <SelectContent>
-                      {EMBIO_PRODUCTS.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+                      {produtosEmbio.map((p) => (
+                        <SelectItem key={p.id} value={p.nome_item}>{p.nome_item}</SelectItem>
+                      ))}
+                      {produtosEmbio.length === 0 && (
+                        <SelectItem value="__empty__" disabled>Nenhum produto no catálogo</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

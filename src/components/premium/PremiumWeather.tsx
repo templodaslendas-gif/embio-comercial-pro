@@ -120,7 +120,7 @@ export function PremiumWeather({ className, showSummary }: { className?: string;
   return (
     <div className={cn("relative overflow-hidden rounded-2xl border border-border/40 bg-card/80 backdrop-blur-xl", className)}>
       <div className={cn("absolute inset-0 bg-gradient-to-br pointer-events-none", gradient)} />
-      <div className="relative p-5 space-y-5">
+      <div className="relative p-4 space-y-3">
         {(permission === "prompt" || permission === "unknown") ? (
           <div className="flex items-center justify-between gap-3 rounded-xl bg-accent/8 border border-accent/15 px-4 py-3">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -178,12 +178,12 @@ function WeatherContent({
             <MapPin className="h-3.5 w-3.5" />
             <span className="truncate max-w-[180px]">{coords.name}</span>
           </div>
-          <div className="flex items-end gap-4">
-            <CurrentIcon className="h-16 w-16 text-accent mb-1 shrink-0" />
+          <div className="flex items-end gap-2">
+            <CurrentIcon className="h-10 w-10 text-accent shrink-0" />
             <div>
               <div className="flex items-start">
-                <span className="text-6xl font-bold tabular-nums leading-none text-foreground">{temp}</span>
-                <span className="text-2xl font-light text-muted-foreground mt-2.5">°C</span>
+                <span className="text-4xl font-bold tabular-nums leading-none text-foreground">{temp}</span>
+                <span className="text-xl font-light text-muted-foreground mt-1">°C</span>
               </div>
               <p className="text-sm text-muted-foreground/80 mt-2">{desc}</p>
             </div>
@@ -207,7 +207,7 @@ function WeatherContent({
       </div>
 
       {/* Previsão 7 dias */}
-      <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-border/25">
+      <div className="grid grid-cols-7 gap-1.5 pt-2 border-t border-border/25">
         {(data.daily?.time ?? []).map((t: string, i: number) => {
           const Icon = iconFor(data.daily.weather_code[i]);
           const max = Math.round(data.daily.temperature_2m_max[i]);
@@ -219,15 +219,15 @@ function WeatherContent({
           const isToday = i === 0;
           return (
             <div key={t} className={cn(
-              "flex flex-col items-center gap-1 rounded-xl py-3 px-1 transition-colors",
+              "flex flex-col items-center gap-1 rounded-xl py-1.5 px-0.5 transition-colors",
               isToday ? "bg-accent/15 ring-1 ring-accent/25" : "bg-muted/20 hover:bg-muted/35",
             )}>
               <span className={cn("text-xs font-semibold leading-none", isToday ? "text-accent" : "text-muted-foreground/70")}>
                 {dayLabel}
               </span>
-              <Icon className={cn("h-5 w-5 mt-0.5", isToday ? "text-accent" : "text-muted-foreground/70")} />
-              <span className="text-sm tabular-nums font-semibold text-foreground leading-tight">{max}°</span>
-              <span className="text-xs tabular-nums text-muted-foreground/60 leading-tight">{min}°</span>
+              <Icon className={cn("h-4 w-4 mt-0.5", isToday ? "text-accent" : "text-muted-foreground/70")} />
+              <span className="text-xs tabular-nums font-semibold text-foreground leading-tight">{max}°</span>
+              <span className="text-[11px] tabular-nums text-muted-foreground/60 leading-tight">{min}°</span>
             </div>
           );
         })}
@@ -303,7 +303,7 @@ function WeatherSkeleton() {
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-3">
           <Skeleton className="h-3.5 w-32" />
-          <Skeleton className="h-16 w-48" />
+          <Skeleton className="h-10 w-36" />
           <Skeleton className="h-3.5 w-24" />
         </div>
         <div className="space-y-2.5">
@@ -313,7 +313,7 @@ function WeatherSkeleton() {
         </div>
       </div>
       <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-border/25">
-        {Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
+        {Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
       </div>
     </div>
   );

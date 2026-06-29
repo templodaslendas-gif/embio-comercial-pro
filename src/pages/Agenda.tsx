@@ -3,7 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchServicos, createServico, updateServico, deleteServico, type Servico,
 } from "@/lib/agendaQueries";
-import { fetchClientes } from "@/lib/clientesQueries";
+import { fetchClientes, createCliente } from "@/lib/clientesQueries";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -66,6 +68,9 @@ export default function Agenda() {
   const [editing, setEditing] = useState<Servico | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Servico | null>(null);
   const [form, setForm] = useState(defaultForm);
+  const [quickClientOpen, setQuickClientOpen] = useState(false);
+  const [quickClientForm, setQuickClientForm] = useState({ nome: "", telefone: "", cidade: "" });
+  const [savingQuickClient, setSavingQuickClient] = useState(false);
 
   const { data: servicos = [], isLoading } = useQuery({
     queryKey: ["servicos"],
@@ -162,6 +167,30 @@ export default function Agenda() {
     },
     onError: (e: any) => toast.error(e?.message ?? "Erro ao atualizar status"),
   });
+
+  const handleSaveQuickClient = async () => {
+    if (!quickClientForm.nome.trim()) {
+      toast.error("Nome do cliente é obrigatório");
+      return;
+    }
+    setSavingQuickClient(true);
+    try {
+      const novoCliente = await createCliente({
+        nome: quickClientForm.nome.trim(),
+        telefone: quickClientForm.telefone.trim() || null,
+        cidade: quickClientForm.cidade.trim() || null,
+      });
+      qc.invalidateQueries({ queryKey: ["clientes"] });
+      setForm((prev) => ({ ...prev, cliente_id: novoCliente.id }));
+      setQuickClientOpen(false);
+      setQuickClientForm({ nome: "", telefone: "", cidade: "" });
+      toast.success(`Cliente "${novoCliente.nome}" cadastrado e selecionado`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao cadastrar cliente");
+    } finally {
+      setSavingQuickClient(false);
+    }
+  };
 
   const agendados  = servicos.filter((s) => s.status === "agendado").length;
   const concluidos = servicos.filter((s) => s.status === "concluido").length;
@@ -379,20 +408,32 @@ export default function Agenda() {
             </div>
             <div className="space-y-1.5">
               <Label>Cliente</Label>
-              <Select
-                value={form.cliente_id || "__none__"}
-                onValueChange={(v) => setForm({ ...form, cliente_id: v === "__none__" ? "" : v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar cliente (opcional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Nenhum</SelectItem>
-                  {clientes.filter((c) => c.status === "ativo").map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select
+                  value={form.cliente_id || "__none__"}
+                  onValueChange={(v) => setForm({ ...form, cliente_id: v === "__none__" ? "" : v })}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Selecionar cliente (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Nenhum</SelectItem>
+                    {clientes.filter((c) => c.status === "ativo").map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="shrink-0 h-10 w-10"
+                  title="Cadastrar novo cliente"
+                  onClick={() => setQuickClientOpen(true)}
+                >
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label>Tipo</Label>
@@ -455,6 +496,49 @@ export default function Agenda() {
           </form>
         </SheetContent>
       </Sheet>
+
+      {/* Quick client dialog */}
+      <Dialog open={quickClientOpen} onOpenChange={(o) => { if (!o) { setQuickClientOpen(false); setQuickClientForm({ nome: "", telefone: "", cidade: "" }); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Cadastrar Novo Cliente</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label>Nome *</Label>
+              <Input
+                placeholder="Nome do cliente ou empresa"
+                value={quickClientForm.nome}
+                onChange={(e) => setQuickClientForm((prev) => ({ ...prev, nome: e.target.value }))}
+                autoFocus
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Telefone</Label>
+              <Input
+                placeholder="(00) 00000-0000"
+                value={quickClientForm.telefone}
+                onChange={(e) => setQuickClientForm((prev) => ({ ...prev, telefone: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cidade</Label>
+              <Input
+                placeholder="Ex: Cascavel"
+                value={quickClientForm.cidade}
+                onChange={(e) => setQuickClientForm((prev) => ({ ...prev, cidade: e.target.value }))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setQuickClientOpen(false)}>Cancelar</Button>
+            <Button onClick={handleSaveQuickClient} disabled={savingQuickClient}>
+              {savingQuickClient && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
+              Cadastrar e Selecionar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete confirm */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
