@@ -35,6 +35,10 @@ import {
 } from "lucide-react";
 
 const toNum = (v: any): number => parseFloat(String(v ?? 0)) || 0;
+const safeMoney = (value: unknown): number => {
+  const n = Number(String(value ?? "0").replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+};
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const STATUS_CFG: Record<OrcamentoStatus, { label: string; cls: string }> = {
@@ -69,7 +73,7 @@ export default function OrcamentosComerciais() {
     });
   }, [orcamentos, search, filterStatus]);
 
-  const totalOrcado = useMemo(() => orcamentos.reduce((s, o) => s + toNum(o.total), 0), [orcamentos]);
+  const totalOrcado = useMemo(() => orcamentos.reduce((sum, o) => sum + safeMoney(o.total), 0), [orcamentos]);
   const countAprovado = useMemo(
     () => orcamentos.filter((o) => o.status === "aprovado" || o.status === "finalizado").length,
     [orcamentos],
