@@ -99,6 +99,43 @@ export async function cancelarMovimentacao(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function ensureEntradaFromOrcamento(orc: {
+  id: string;
+  cliente_id: string | null;
+  cliente_nome: string | null;
+  numero_orcamento: string | null;
+  total: number | string;
+}): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const { data: existing } = await db()
+    .select("id")
+    .eq("orcamento_id", orc.id)
+    .neq("status", "cancelado")
+    .limit(1);
+  if (existing && existing.length > 0) return;
+  const valor = parseFloat(String(orc.total ?? 0)) || 0;
+  const descricao = [orc.numero_orcamento, orc.cliente_nome].filter(Boolean).join(" — ") || "Proposta aprovada";
+  await db().insert({
+    user_id: user.id,
+    tipo: "entrada",
+    descricao,
+    categoria: "Propostas",
+    valor,
+    status: "pendente",
+    orcamento_id: orc.id,
+    cliente_id: orc.cliente_id,
+    data_vencimento: new Date().toISOString().slice(0, 10),
+  });
+}
+
+export async function cancelarEntradaByOrcamento(orcamentoId: string): Promise<void> {
+  await db()
+    .update({ status: "cancelado" })
+    .eq("orcamento_id", orcamentoId)
+    .neq("status", "cancelado");
+}
+
 export async function fetchRealMetrics(): Promise<FinanceiroRealMetrics> {
   const { data, error } = await db().select(
     "tipo,valor,status,data_vencimento",

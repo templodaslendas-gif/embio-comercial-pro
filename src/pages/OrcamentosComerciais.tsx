@@ -6,6 +6,7 @@ import {
   duplicateOrcamento,
   type OrcamentoComercial, type OrcamentoStatus,
 } from "@/lib/orcamentosComercialQueries";
+import { ensureEntradaFromOrcamento, cancelarEntradaByOrcamento } from "@/lib/financeiroQueries";
 import { generateOrcamentoPdfComercial } from "@/lib/orcamentoPdfComercial";
 import { useBranding } from "@/hooks/useBranding";
 import { PremiumHeader, PremiumStat } from "@/components/premium";
@@ -92,10 +93,20 @@ export default function OrcamentosComerciais() {
   });
 
   const statusMut = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: OrcamentoStatus }) =>
-      updateOrcamentoStatus(id, status),
+    mutationFn: async ({ id, status, orc }: { id: string; status: OrcamentoStatus; orc: OrcamentoComercial }) => {
+      await updateOrcamentoStatus(id, status);
+      if (status === "aprovado" || status === "finalizado") {
+        await ensureEntradaFromOrcamento(orc);
+      } else if (status === "em_aberto" || status === "recusado") {
+        await cancelarEntradaByOrcamento(id);
+      }
+    },
     onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: ["orcamentos"] });
+      qc.invalidateQueries({ queryKey: ["financeiro-movimentacoes"] });
+      qc.invalidateQueries({ queryKey: ["financeiro-real-metrics"] });
+      qc.invalidateQueries({ queryKey: ["financeiro-chart"] });
+      qc.invalidateQueries({ queryKey: ["financeiro-cat"] });
       toast.success(`Status atualizado: ${STATUS_CFG[status].label}`);
     },
     onError: (e: any) => toast.error(e?.message ?? "Erro"),
@@ -298,22 +309,22 @@ export default function OrcamentosComerciais() {
                             </DropdownMenuLabel>
 
                             {orc.status !== "em_aberto" && (
-                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "em_aberto" })}>
+                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "em_aberto", orc })}>
                                 <RotateCcw className="h-3.5 w-3.5 mr-2 text-amber-600" /> Em Aberto
                               </DropdownMenuItem>
                             )}
                             {orc.status !== "aprovado" && (
-                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "aprovado" })}>
+                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "aprovado", orc })}>
                                 <CheckCircle2 className="h-3.5 w-3.5 mr-2 text-green-600" /> Aprovado
                               </DropdownMenuItem>
                             )}
                             {orc.status !== "finalizado" && (
-                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "finalizado" })}>
+                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "finalizado", orc })}>
                                 <Clock className="h-3.5 w-3.5 mr-2 text-blue-600" /> Finalizado
                               </DropdownMenuItem>
                             )}
                             {orc.status !== "recusado" && (
-                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "recusado" })}>
+                              <DropdownMenuItem onClick={() => statusMut.mutate({ id: orc.id, status: "recusado", orc })}>
                                 <XCircle className="h-3.5 w-3.5 mr-2 text-red-600" /> Recusado
                               </DropdownMenuItem>
                             )}

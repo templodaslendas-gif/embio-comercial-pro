@@ -10,25 +10,25 @@ import { useBranding } from "@/hooks/useBranding";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
-  SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   SidebarHeader, SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
 const nav =
-  "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 text-[13.5px] text-sidebar-foreground/80 transition-colors duration-150 hover:bg-sidebar-primary/15 hover:text-sidebar-foreground";
-const navActive = "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-md border-l-2 border-white/30";
+  "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 text-[13.5px] text-sidebar-foreground/95 transition-colors duration-150 hover:bg-sidebar-primary/20 hover:text-sidebar-foreground";
+const navActive = "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-md";
 const subNav =
-  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[12.5px] text-sidebar-foreground/65 transition-colors duration-150 hover:bg-sidebar-primary/12 hover:text-sidebar-primary";
+  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[12.5px] text-sidebar-foreground/80 transition-colors duration-150 hover:bg-sidebar-primary/15 hover:text-sidebar-primary";
 const subNavActive = "text-sidebar-primary font-semibold";
 
-const Divider = () => <div className="mx-2.5 my-2.5 border-t border-sidebar-border/70" />;
+const Divider = () => <div className="mx-3 my-2.5 border-t border-sidebar-foreground/15" />;
 
 const GroupLabel = ({ children }: { children: React.ReactNode }) => (
-  <SidebarGroupLabel className="text-[10.5px] px-2.5 py-1.5 mt-1 uppercase tracking-widest text-sidebar-primary/85 font-extrabold">
+  <div className="px-3 pb-1 pt-2 text-[10.5px] uppercase tracking-widest font-extrabold text-sidebar-primary select-none">
     {children}
-  </SidebarGroupLabel>
+  </div>
 );
 
 export function AppSidebar() {
