@@ -29,7 +29,7 @@ import { MovimentacaoModal } from "@/components/financeiro/MovimentacaoModal";
 import { toast } from "sonner";
 import {
   FileText, Plus, Search, TrendingUp, CheckCircle2, Eye,
-  MoreVertical, Pencil, Trash2, XCircle, Clock, Loader2,
+  ChevronDown, Pencil, Trash2, XCircle, Clock, Loader2,
   DollarSign, Copy, MessageCircle, RotateCcw, FileDown,
 } from "lucide-react";
 
@@ -201,7 +201,7 @@ export default function OrcamentosComerciais() {
       </div>
 
       {/* Tabela */}
-      <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl overflow-hidden shadow-sm">
+      <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl overflow-x-auto shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="border-border/30 hover:bg-transparent">
@@ -209,8 +209,8 @@ export default function OrcamentosComerciais() {
               <TableHead className="text-xs uppercase tracking-wider text-muted-foreground">Cliente</TableHead>
               <TableHead className="text-xs uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Data</TableHead>
               <TableHead className="text-xs uppercase tracking-wider text-muted-foreground text-right">Total</TableHead>
-              <TableHead className="text-xs uppercase tracking-wider text-muted-foreground text-center hidden md:table-cell">Status</TableHead>
-              <TableHead className="text-xs uppercase tracking-wider text-muted-foreground text-right">Ações</TableHead>
+              <TableHead className="text-xs uppercase tracking-wider text-muted-foreground text-center hidden sm:table-cell">Status</TableHead>
+              <TableHead className="text-xs uppercase tracking-wider text-muted-foreground text-right w-24">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -248,15 +248,19 @@ export default function OrcamentosComerciais() {
                       {new Date(orc.created_at).toLocaleDateString("pt-BR")}
                     </TableCell>
                     <TableCell className="text-right font-bold tabular-nums text-sm">{brl(toNum(orc.total))}</TableCell>
-                    <TableCell className="text-center hidden md:table-cell">
+                    <TableCell className="text-center hidden sm:table-cell">
                       <Badge variant="outline" className={`text-xs ${st.cls}`}>{st.label}</Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       <div className="flex items-center justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-7 w-7">
-                              <MoreVertical className="h-3.5 w-3.5" />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 gap-1.5 text-xs border-border/70 hover:border-border hover:bg-muted/60"
+                            >
+                              Ações <ChevronDown className="h-3 w-3 opacity-60" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-52">

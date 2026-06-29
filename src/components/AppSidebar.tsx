@@ -17,16 +17,16 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 
 const nav =
-  "flex items-center gap-2.5 w-full rounded-md px-2.5 py-[7px] text-[13px] text-sidebar-foreground/70 transition-colors duration-150 hover:bg-sidebar-primary/12 hover:text-sidebar-foreground";
-const navActive = "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-sm";
+  "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 text-[13.5px] text-sidebar-foreground/80 transition-colors duration-150 hover:bg-sidebar-primary/15 hover:text-sidebar-foreground";
+const navActive = "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-md border-l-2 border-white/30";
 const subNav =
-  "flex items-center gap-2 w-full rounded-md px-2.5 py-[6px] text-[12px] text-sidebar-foreground/55 transition-colors duration-150 hover:bg-sidebar-primary/10 hover:text-sidebar-primary";
-const subNavActive = "text-sidebar-primary font-medium";
+  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[12.5px] text-sidebar-foreground/65 transition-colors duration-150 hover:bg-sidebar-primary/12 hover:text-sidebar-primary";
+const subNavActive = "text-sidebar-primary font-semibold";
 
-const Divider = () => <div className="mx-2.5 my-3 border-t border-border/30" />;
+const Divider = () => <div className="mx-2.5 my-2.5 border-t border-sidebar-border/70" />;
 
 const GroupLabel = ({ children }: { children: React.ReactNode }) => (
-  <SidebarGroupLabel className="text-[10px] px-2.5 py-1 uppercase tracking-widest text-sidebar-primary/55 font-bold">
+  <SidebarGroupLabel className="text-[10.5px] px-2.5 py-1.5 mt-1 uppercase tracking-widest text-sidebar-primary/85 font-extrabold">
     {children}
   </SidebarGroupLabel>
 );
@@ -79,7 +79,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end={item.end} className={nav} activeClassName={navActive}>
-                      <item.icon className="h-[15px] w-[15px] shrink-0 opacity-70" />
+                      <item.icon className="h-[15px] w-[15px] shrink-0 opacity-85" />
                       <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
@@ -102,7 +102,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={nav} activeClassName={navActive}>
-                      <item.icon className="h-[15px] w-[15px] shrink-0 opacity-70" />
+                      <item.icon className="h-[15px] w-[15px] shrink-0 opacity-85" />
                       <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
@@ -122,7 +122,7 @@ export function AppSidebar() {
                 <Collapsible open={produtosOpen} onOpenChange={setProdutosOpen}>
                   <CollapsibleTrigger className={cn(nav, "justify-between")}>
                     <span className="flex items-center gap-2.5">
-                      <Package className="h-[15px] w-[15px] shrink-0 opacity-70" />
+                      <Package className="h-[15px] w-[15px] shrink-0 opacity-85" />
                       <span>{t("sidebar.products")}</span>
                     </span>
                     <ChevronRight className={cn("h-3 w-3 opacity-40 transition-transform duration-200", produtosOpen && "rotate-90")} />
@@ -152,7 +152,7 @@ export function AppSidebar() {
                 <Collapsible open={propulsoresOpen} onOpenChange={setPropulsoresOpen}>
                   <CollapsibleTrigger className={cn(nav, "justify-between")}>
                     <span className="flex items-center gap-2.5">
-                      <Cog className="h-[15px] w-[15px] shrink-0 opacity-70" />
+                      <Cog className="h-[15px] w-[15px] shrink-0 opacity-85" />
                       <span>{t("sidebar.propulsors")}</span>
                     </span>
                     <ChevronRight className={cn("h-3 w-3 opacity-40 transition-transform duration-200", propulsoresOpen && "rotate-90")} />
@@ -181,7 +181,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <NavLink to="/instrucoes" className={nav} activeClassName={navActive}>
-                    <BookOpen className="h-[15px] w-[15px] shrink-0 opacity-70" />
+                    <BookOpen className="h-[15px] w-[15px] shrink-0 opacity-85" />
                     <span>{t("sidebar.instructions")}</span>
                   </NavLink>
                 </SidebarMenuButton>
@@ -199,7 +199,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <NavLink to="/configuracoes-marca" className={nav} activeClassName={navActive}>
-                    <Palette className="h-[15px] w-[15px] shrink-0 opacity-70" />
+                    <Palette className="h-[15px] w-[15px] shrink-0 opacity-85" />
                     <span>{t("sidebar.branding")}</span>
                   </NavLink>
                 </SidebarMenuButton>
@@ -212,7 +212,7 @@ export function AppSidebar() {
                     rel="noopener noreferrer"
                     className={nav}
                   >
-                    <Headphones className="h-[15px] w-[15px] shrink-0 opacity-70" />
+                    <Headphones className="h-[15px] w-[15px] shrink-0 opacity-85" />
                     <span>{t("sidebar.support")}</span>
                   </a>
                 </SidebarMenuButton>
