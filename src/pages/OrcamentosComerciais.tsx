@@ -12,9 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -47,7 +45,7 @@ export default function OrcamentosComerciais() {
   const qc = useQueryClient();
   const { branding } = useBranding();
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [deleteTarget, setDeleteTarget] = useState<OrcamentoComercial | null>(null);
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
   const [financeiroModal, setFinanceiroModal] = useState<OrcamentoComercial | null>(null);
@@ -71,6 +69,13 @@ export default function OrcamentosComerciais() {
     () => orcamentos.filter((o) => o.status === "aprovado" || o.status === "finalizado").length,
     [orcamentos],
   );
+  const counts = useMemo(() => ({
+    all:        orcamentos.length,
+    em_aberto:  orcamentos.filter((o) => o.status === "em_aberto").length,
+    aprovado:   orcamentos.filter((o) => o.status === "aprovado").length,
+    recusado:   orcamentos.filter((o) => o.status === "recusado").length,
+    finalizado: orcamentos.filter((o) => o.status === "finalizado").length,
+  }), [orcamentos]);
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteOrcamento(id),
@@ -133,26 +138,39 @@ export default function OrcamentosComerciais() {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            placeholder="Buscar por cliente ou número..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Status" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="em_aberto">Em aberto</SelectItem>
-            <SelectItem value="aprovado">Aprovado</SelectItem>
-            <SelectItem value="recusado">Recusado</SelectItem>
-            <SelectItem value="finalizado">Finalizado</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Abas por status */}
+      <Tabs value={filterStatus} onValueChange={setFilterStatus}>
+        <TabsList className="flex h-auto flex-wrap gap-1 rounded-xl bg-muted/40 p-1">
+          {[
+            { value: "all",        label: "Todos",      count: counts.all },
+            { value: "em_aberto",  label: "Em aberto",  count: counts.em_aberto },
+            { value: "aprovado",   label: "Aprovados",  count: counts.aprovado },
+            { value: "recusado",   label: "Recusados",  count: counts.recusado },
+            { value: "finalizado", label: "Finalizados",count: counts.finalizado },
+          ].map(({ value, label, count }) => (
+            <TabsTrigger
+              key={value}
+              value={value}
+              className="gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              {label}
+              <span className="inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-muted px-1 text-[10px] tabular-nums text-muted-foreground data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
+                {count}
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {/* Busca */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Input
+          placeholder="Buscar por cliente ou número..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
       </div>
 
       <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl overflow-hidden shadow-sm">
