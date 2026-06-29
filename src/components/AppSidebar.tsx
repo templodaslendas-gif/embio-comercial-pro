@@ -17,16 +17,23 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 
 const nav =
-  "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 text-[13.5px] text-sidebar-foreground/95 transition-colors duration-150 hover:bg-sidebar-primary/20 hover:text-sidebar-foreground";
-const navActive = "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-md";
+  "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 text-[13.5px] text-slate-100 transition-colors duration-150 hover:bg-white/10 hover:text-white";
+const navActive = "bg-green-600 text-white font-semibold shadow-md";
 const subNav =
-  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[12.5px] text-sidebar-foreground/80 transition-colors duration-150 hover:bg-sidebar-primary/15 hover:text-sidebar-primary";
-const subNavActive = "text-sidebar-primary font-semibold";
+  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[12.5px] text-slate-300 transition-colors duration-150 hover:bg-white/8 hover:text-green-400";
+const subNavActive = "text-green-400 font-semibold";
 
-const Divider = () => <div className="mx-3 my-2.5 border-t border-sidebar-foreground/15" />;
+const Divider = () => <div className="mx-3 my-2.5 border-t border-white/10" />;
 
-const GroupLabel = ({ children }: { children: React.ReactNode }) => (
-  <div className="px-3 pb-1 pt-2 text-[10.5px] uppercase tracking-widest font-extrabold text-sidebar-primary select-none">
+const GROUP_COLORS = {
+  green: "text-green-400",
+  blue:  "text-blue-400",
+  cyan:  "text-cyan-400",
+  gray:  "text-slate-400",
+} as const;
+
+const GroupLabel = ({ children, color = "green" }: { children: React.ReactNode; color?: keyof typeof GROUP_COLORS }) => (
+  <div className={`px-3 pb-1 pt-2 text-[10.5px] uppercase tracking-widest font-extrabold select-none ${GROUP_COLORS[color]}`}>
     {children}
   </div>
 );
@@ -65,7 +72,7 @@ export function AppSidebar() {
 
       <SidebarContent className="px-2 py-2 gap-0">
         <SidebarGroup className="p-0">
-          <GroupLabel>Comercial</GroupLabel>
+          <GroupLabel color="green">Comercial</GroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
               {[
@@ -92,7 +99,7 @@ export function AppSidebar() {
         <Divider />
 
         <SidebarGroup className="p-0">
-          <GroupLabel>Orçamentos</GroupLabel>
+          <GroupLabel color="blue">Orçamentos</GroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
               {[
@@ -115,7 +122,7 @@ export function AppSidebar() {
         <Divider />
 
         <SidebarGroup className="p-0">
-          <GroupLabel>Técnico</GroupLabel>
+          <GroupLabel color="cyan">Técnico</GroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
               <li>
@@ -193,7 +200,7 @@ export function AppSidebar() {
         <Divider />
 
         <SidebarGroup className="p-0">
-          <GroupLabel>Admin</GroupLabel>
+          <GroupLabel color="gray">Admin</GroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
               <SidebarMenuItem>
