@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { LogIn, UserPlus, Loader2, Eye, EyeOff, Wheat, FlaskConical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { FFRFooter } from "@/components/FFRFooter";
 
 const Auth = () => {
   const { user, loading, signIn, signUp } = useAuth();
@@ -123,9 +124,10 @@ const Auth = () => {
 
         {/* Footer */}
         <div className="relative">
-          <p className="text-[10px] text-sidebar-foreground/25 uppercase tracking-widest">
+          <p className="text-[10px] text-sidebar-foreground/25 uppercase tracking-widest mb-1">
             {branding.company_name || "Embio"} · Sistema Interno
           </p>
+          <FFRFooter className="py-1 justify-start" />
         </div>
       </div>
 
@@ -250,6 +252,7 @@ const Auth = () => {
               {isLogin ? t("auth.noAccount") : t("auth.hasAccount")}
             </button>
           </div>
+          <FFRFooter className="mt-8" />
         </div>
       </div>
     </div>

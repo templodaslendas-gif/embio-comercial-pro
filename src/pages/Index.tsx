@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useBranding } from "@/hooks/useBranding";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  FileText, CheckCircle2, Clock, XCircle, Package, Cog, ChevronDown, ChevronUp,
+  FileText, CheckCircle2, Clock, XCircle, ChevronDown, ChevronUp,
   Plus, UserCheck, LayoutList, CalendarDays, Inbox, TrendingUp, PieChart as PieIconLucide,
   Receipt, Landmark,
 } from "lucide-react";
@@ -89,34 +89,6 @@ const Index = () => {
     });
   }, [quotes, selectedMonth]);
 
-  const productDetails = useMemo(() => {
-    const map: Record<string, { count: number; clients: string[] }> = {};
-    const add = (key: string, qty: number, client: string) => {
-      if (!map[key]) map[key] = { count: 0, clients: [] };
-      map[key].count += qty;
-      if (!map[key].clients.includes(client)) map[key].clients.push(client);
-    };
-    quotes.forEach((q) => {
-      const n = q.empresa_name || q.producer_name;
-      const adts = q.aditivos_json as any[];
-      if (adts?.length > 0) adts.forEach((a: any) => a.produto && add(a.produto, a.quantidade || 1, n));
-      else if (q.product_name && q.product_name !== "Sem aditivo") add(q.product_name, q.frascos || 1, n);
-    });
-    return map;
-  }, [quotes]);
-
-  const propulsorDetails = useMemo(() => {
-    const map: Record<string, string[]> = {};
-    quotes.forEach((q) => {
-      const n = q.empresa_name || q.producer_name;
-      (q.propulsores_json as any[])?.forEach((p: any) => {
-        if (!p.modelo) return;
-        if (!map[p.modelo]) map[p.modelo] = [];
-        if (!map[p.modelo].includes(n)) map[p.modelo].push(n);
-      });
-    });
-    return map;
-  }, [quotes]);
 
   const evolution = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -172,8 +144,6 @@ const Index = () => {
     concluidos: servicosData.filter((s) => s.status === "concluido").length,
     hoje:       servicosData.filter((s) => s.status === "agendado" && s.data === todayStr).length,
   }), [servicosData, todayStr]);
-
-  const unitLabel = (n: number) => n === 1 ? t("common.unit") : t("common.units");
 
   const metricCards = [
     { id: "feitos",      label: t("dashboard.quotesMade"), value: total,             icon: FileText },
@@ -247,36 +217,7 @@ const Index = () => {
           </div>
         </PremiumSection>
 
-        {/* 4. PIPELINE */}
-        <PremiumSection label="Pipeline Técnico" action={
-          <Link to="/novo-orcamento" className="text-sm text-accent hover:underline font-medium">+ Novo orçamento</Link>
-        }>
-          <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
-            {quotes.length === 0 ? (
-              <PremiumEmptyState icon={FileText} title="Nenhum orçamento técnico" description="Crie o primeiro orçamento para um produtor rural." />
-            ) : (
-              <div className="divide-y divide-border/35 max-h-[300px] overflow-y-auto">
-                {quotes.slice(0, 8).map((q) => {
-                  const s = statusLabels[q.status] || statusLabels.em_aberto;
-                  return (
-                    <div key={q.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/15 transition-colors">
-                      <div className="h-8 w-8 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
-                        <FileText className="h-4 w-4 text-muted-foreground/50" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-foreground truncate">{q.empresa_name || q.producer_name}</p>
-                        <p className="text-xs text-muted-foreground/65">{new Date(q.created_at).toLocaleDateString("pt-BR")} · {q.product_name}</p>
-                      </div>
-                      <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full shrink-0", s.color)}>{s.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </PremiumSection>
-
-        {/* 5. ORÇAMENTOS */}
+        {/* 4. ORÇAMENTOS */}
         <PremiumSection label="Orçamentos Técnicos">
           <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
             {metricCards.map((m) => {
@@ -390,52 +331,6 @@ const Index = () => {
           </div>
         </PremiumSection>
 
-        {/* PRODUTOS TÉCNICOS */}
-        <PremiumSection label="Produtos Técnicos">
-          <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
-            {[
-              { id: "produtos",    icon: Package, label: t("dashboard.quotedProducts"),   count: Object.keys(productDetails).length,
-                items: Object.entries(productDetails).map(([k, v]) => ({ primary: k, secondary: `${v.count} ${unitLabel(v.count)} · ${v.clients.join(", ")}` })),
-                empty: t("dashboard.noProducts") },
-              { id: "propulsores", icon: Cog,     label: t("dashboard.quotedPropulsors"), count: Object.keys(propulsorDetails).length,
-                items: Object.entries(propulsorDetails).map(([k, v]) => ({ primary: k, secondary: `${v.length} ${v.length === 1 ? t("common.client") : t("common.clients")} · ${v.join(", ")}` })),
-                empty: t("dashboard.noPropulsors") },
-            ].map((sec) => (
-              <div key={sec.id} className="rounded-xl border border-border/60 bg-card cursor-pointer shadow-[0_1px_3px_hsl(210_20%_20%/0.06)]" onClick={() => toggle(sec.id)}>
-                <div className="p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
-                        <sec.icon className="h-4 w-4 text-accent" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold tabular-nums leading-none text-foreground">{sec.count}</p>
-                        <p className="text-xs text-muted-foreground/65 mt-1">{sec.label}</p>
-                      </div>
-                    </div>
-                    {expandedCard === sec.id
-                      ? <ChevronUp className="h-4 w-4 text-muted-foreground/50" />
-                      : <ChevronDown className="h-4 w-4 text-muted-foreground/40" />}
-                  </div>
-                  {expandedCard === sec.id && (
-                    <div className="mt-4 border-t border-border/40 pt-4 space-y-2 max-h-[200px] overflow-y-auto">
-                      {sec.items.length === 0 ? (
-                        <p className="text-sm text-muted-foreground/60 py-4 text-center">{sec.empty}</p>
-                      ) : sec.items.map((item, i) => (
-                        <div key={i} className="rounded-lg bg-muted/25 px-3.5 py-2.5">
-                          <p className="text-sm font-medium text-foreground">{item.primary}</p>
-                          <p className="text-xs text-muted-foreground/65 mt-0.5 truncate">{item.secondary}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </PremiumSection>
-
-        <p className="text-xs text-muted-foreground/40 text-center pb-2">{t("dashboard.dataFooter")}</p>
       </div>
     </PremiumPage>
   );
