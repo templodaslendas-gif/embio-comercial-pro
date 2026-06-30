@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { safeMoney } from "@/lib/utils";
 
 export type MovTipo = "entrada" | "saida";
 export type MovStatus = "pendente" | "pago" | "vencido" | "cancelado";
@@ -44,6 +45,9 @@ export interface FinanceiroRealMetrics {
   contasVencidas: number;
   countPendentes: number;
   countVencidas: number;
+  entradasMes: number;
+  saidasMes: number;
+  pendentesMes: number;
 }
 
 const db = () => (supabase as any).from("financeiro_movimentacoes");
@@ -114,7 +118,7 @@ export async function ensureEntradaFromOrcamento(orc: {
     .neq("status", "cancelado")
     .limit(1);
   if (existing && existing.length > 0) return;
-  const valor = parseFloat(String(orc.total ?? 0)) || 0;
+  const valor = safeMoney(orc.total);
   const descricao = [orc.numero_orcamento, orc.cliente_nome].filter(Boolean).join(" — ") || "Proposta aprovada";
   await db().insert({
     user_id: user.id,
@@ -161,11 +165,15 @@ export async function fetchRealMetrics(): Promise<FinanceiroRealMetrics> {
   const sum = (arr: typeof rows, tipo: string) =>
     arr
       .filter((r) => r.tipo === tipo)
-      .reduce((s, r) => s + Number(r.valor), 0);
+      .reduce((s, r) => s + safeMoney(r.valor), 0);
 
   const notCanceled = rows.filter((r) => r.status !== "cancelado");
   const entPrev = sum(notCanceled, "entrada");
   const saiPrev = sum(notCanceled, "saida");
+
+  const mes = today.slice(0, 7);
+  const rowsMes = notCanceled.filter((r) => (r.data_vencimento ?? "").startsWith(mes));
+  const pendingMes = pending.filter((r) => (r.data_vencimento ?? "").startsWith(mes));
 
   return {
     totalEntradas: entPrev,
@@ -176,6 +184,9 @@ export async function fetchRealMetrics(): Promise<FinanceiroRealMetrics> {
     contasVencidas: sum(vencidas, "entrada") + sum(vencidas, "saida"),
     countPendentes: pending.length,
     countVencidas: vencidas.length,
+    entradasMes: sum(rowsMes, "entrada"),
+    saidasMes: sum(rowsMes, "saida"),
+    pendentesMes: sum(pendingMes, "entrada") + sum(pendingMes, "saida"),
   };
 }
 
@@ -197,8 +208,8 @@ export async function fetchChartData(): Promise<
   rows.forEach((r) => {
     const key = (r.data_vencimento ?? r.tipo).slice(0, 7);
     if (!map[key]) map[key] = { entradas: 0, saidas: 0 };
-    if (r.tipo === "entrada") map[key].entradas += Number(r.valor);
-    else map[key].saidas += Number(r.valor);
+    if (r.tipo === "entrada") map[key].entradas += safeMoney(r.valor);
+    else map[key].saidas += safeMoney(r.valor);
   });
 
   return Object.entries(map)
@@ -232,7 +243,7 @@ export async function fetchCategoriaData(): Promise<
   rows.forEach((r) => {
     const key = r.categoria || "Sem categoria";
     if (!map[key]) map[key] = { valor: 0, tipo: r.tipo };
-    map[key].valor += Number(r.valor);
+    map[key].valor += safeMoney(r.valor);
   });
 
   return Object.entries(map)

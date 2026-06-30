@@ -57,7 +57,7 @@ import {
   Loader2,
   Plus,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, safeMoney } from "@/lib/utils";
 
 const brl = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -303,7 +303,7 @@ export function MovimentacoesTab({ onEdit, onNew }: Props) {
                           : "text-red-700 dark:text-red-400",
                       )}
                     >
-                      {isEntrada ? "+" : "-"}{brl(Number(m.valor))}
+                      {isEntrada ? "+" : "-"}{brl(safeMoney(m.valor))}
                     </TableCell>
                     <TableCell className="text-center hidden md:table-cell">
                       <Badge variant="outline" className={cn("text-xs", st.cls)}>
@@ -363,7 +363,7 @@ export function MovimentacoesTab({ onEdit, onNew }: Props) {
             <AlertDialogTitle>Excluir movimentação?</AlertDialogTitle>
             <AlertDialogDescription>
               <strong>{deleteTarget?.descricao}</strong> —{" "}
-              {deleteTarget && brl(Number(deleteTarget.valor))} será excluída
+              {deleteTarget && brl(safeMoney(deleteTarget.valor))} será excluída
               permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>

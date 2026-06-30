@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchCatalogo, type CatalogoItem } from "@/lib/orcamentoQueries";
-import { fetchClientes } from "@/lib/clientesQueries";
+import { fetchClientes, createCliente } from "@/lib/clientesQueries";
 import {
   createOrcamento, updateOrcamento, fetchOrcamentoById,
   type OrcamentoItemDraft,
@@ -57,6 +57,10 @@ export default function NovoOrcamentoComercial() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerSearch, setPickerSearch] = useState("");
   const [loaded, setLoaded] = useState(!isEdit);
+  const [novoClienteOpen, setNovoClienteOpen] = useState(false);
+  const [novoNome, setNovoNome] = useState("");
+  const [novoTelefone, setNovoTelefone] = useState("");
+  const [novoCidade, setNovoCidade] = useState("");
 
   const { data: clientes = [] } = useQuery({ queryKey: ["clientes"], queryFn: fetchClientes });
   const { data: catalogo = [] } = useQuery({ queryKey: ["catalogo"], queryFn: fetchCatalogo });
@@ -145,6 +149,26 @@ export default function NovoOrcamentoComercial() {
       ordem: idx,
     }));
 
+  const createClienteMut = useMutation({
+    mutationFn: () => {
+      if (!novoNome.trim()) throw new Error("Informe o nome do cliente");
+      return createCliente({
+        nome: novoNome.trim(),
+        telefone: novoTelefone.trim() || null,
+        cidade: novoCidade.trim() || null,
+      });
+    },
+    onSuccess: (cl) => {
+      qc.invalidateQueries({ queryKey: ["clientes"] });
+      setClienteId(cl.id);
+      setClienteNome(cl.nome);
+      setNovoClienteOpen(false);
+      setNovoNome(""); setNovoTelefone(""); setNovoCidade("");
+      toast.success("Cliente cadastrado");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erro ao cadastrar cliente"),
+  });
+
   const saveMut = useMutation({
     mutationFn: async () => {
       if (!clienteNome.trim() && !clienteId) throw new Error("Informe o nome do cliente");
@@ -225,23 +249,34 @@ export default function NovoOrcamentoComercial() {
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Cliente cadastrado</Label>
-            <Select
-              value={clienteId ?? "__none__"}
-              onValueChange={(v) => {
-                if (v === "__none__") { setClienteId(null); return; }
-                const cl = (clientes as any[]).find((c) => c.id === v);
-                setClienteId(v);
-                if (cl) setClienteNome(cl.nome);
-              }}
-            >
-              <SelectTrigger><SelectValue placeholder="Selecionar cliente..." /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__none__">— Nenhum —</SelectItem>
-                {(clientes as any[]).map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select
+                value={clienteId ?? "__none__"}
+                onValueChange={(v) => {
+                  if (v === "__none__") { setClienteId(null); return; }
+                  const cl = (clientes as any[]).find((c) => c.id === v);
+                  setClienteId(v);
+                  if (cl) setClienteNome(cl.nome);
+                }}
+              >
+                <SelectTrigger className="flex-1"><SelectValue placeholder="Selecionar cliente..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">— Nenhum —</SelectItem>
+                  {(clientes as any[]).map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                title="Novo cliente"
+                onClick={() => setNovoClienteOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label>Nome do cliente *</Label>
@@ -381,6 +416,36 @@ export default function NovoOrcamentoComercial() {
           {isEdit ? "Salvar Alterações" : "Salvar Proposta"}
         </Button>
       </div>
+
+      {/* Modal — Novo Cliente */}
+      <Dialog open={novoClienteOpen} onOpenChange={(o) => { if (!o) setNovoClienteOpen(false); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Novo Cliente</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label>Nome *</Label>
+              <Input placeholder="Nome ou razão social" value={novoNome} onChange={(e) => setNovoNome(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Telefone</Label>
+              <Input placeholder="(00) 00000-0000" value={novoTelefone} onChange={(e) => setNovoTelefone(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cidade</Label>
+              <Input placeholder="Cidade" value={novoCidade} onChange={(e) => setNovoCidade(e.target.value)} />
+            </div>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setNovoClienteOpen(false)}>Cancelar</Button>
+            <Button onClick={() => createClienteMut.mutate()} disabled={createClienteMut.isPending}>
+              {createClienteMut.isPending && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
+              Salvar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Catalog Picker */}
       <Dialog open={pickerOpen} onOpenChange={(o) => { if (!o) { setPickerOpen(false); setPickerSearch(""); } }}>

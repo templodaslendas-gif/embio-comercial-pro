@@ -16,7 +16,7 @@ import { fetchClientes } from "@/lib/clientesQueries";
 import { fetchServicos } from "@/lib/agendaQueries";
 import { fetchOrcamentos } from "@/lib/orcamentosComercialQueries";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { cn } from "@/lib/utils";
+import { cn, safeMoney } from "@/lib/utils";
 import {
   PremiumPage, PremiumSection, PremiumChartCard, PremiumEmptyState,
   PremiumAction, PremiumWeather, useCountUp,
@@ -122,7 +122,7 @@ const Index = () => {
     () =>
       orcamentosData
         .filter((o) => o.status === "aprovado" || o.status === "finalizado")
-        .reduce((s, o) => s + Number(o.total), 0),
+        .reduce((s, o) => s + safeMoney(o.total), 0),
     [orcamentosData],
   );
 
