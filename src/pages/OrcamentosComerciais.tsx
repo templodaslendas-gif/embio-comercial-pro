@@ -29,16 +29,12 @@ import {
 import { MovimentacaoModal } from "@/components/financeiro/MovimentacaoModal";
 import { toast } from "sonner";
 import {
-  FileText, Plus, Search, TrendingUp, CheckCircle2, Eye,
+  FileText, Plus, Search, CheckCircle2, Eye,
   ChevronDown, Pencil, Trash2, XCircle, Clock, Loader2,
   DollarSign, Copy, MessageCircle, RotateCcw, FileDown,
 } from "lucide-react";
 
 const toNum = (v: any): number => parseFloat(String(v ?? 0)) || 0;
-const safeMoney = (value: unknown): number => {
-  const n = Number(String(value ?? "0").replace(",", "."));
-  return Number.isFinite(n) ? n : 0;
-};
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const STATUS_CFG: Record<OrcamentoStatus, { label: string; cls: string }> = {
@@ -73,7 +69,6 @@ export default function OrcamentosComerciais() {
     });
   }, [orcamentos, search, filterStatus]);
 
-  const totalOrcado = useMemo(() => orcamentos.reduce((sum, o) => sum + safeMoney(o.total), 0), [orcamentos]);
   const countAprovado = useMemo(
     () => orcamentos.filter((o) => o.status === "aprovado" || o.status === "finalizado").length,
     [orcamentos],
@@ -173,10 +168,9 @@ export default function OrcamentosComerciais() {
       />
 
       {!isLoading && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <PremiumStat icon={FileText}     label="Total de Propostas" value={orcamentos.length} variant="blue" />
           <PremiumStat icon={CheckCircle2} label="Aprovadas"          value={countAprovado}     variant="green" />
-          <PremiumStat icon={TrendingUp}   label="Total Orçado"       value={brl(totalOrcado)}  variant="default" />
         </div>
       )}
 
