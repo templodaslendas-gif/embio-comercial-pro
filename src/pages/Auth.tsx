@@ -2,18 +2,28 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
-import { useBranding } from "@/hooks/useBranding";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { LogIn, UserPlus, Loader2, Eye, EyeOff, Wheat, FlaskConical } from "lucide-react";
+import { LogIn, UserPlus, Loader2, Eye, EyeOff, Users, FileText, LineChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FFRFooter } from "@/components/FFRFooter";
 
+const APP_NAME = "Embio Intelligence Pro";
+const HEADLINE = "Gestão inteligente de clientes, propostas e vendas.";
+const SUBHEADLINE =
+  "Centralize relacionamento, agenda, financeiro e performance comercial em uma única plataforma.";
+const NICHE_TAG = "Especializado no relacionamento comercial do segmento suíno.";
+
+const BENEFITS = [
+  { icon: Users, label: "Gestão de clientes e relacionamento" },
+  { icon: FileText, label: "Propostas comerciais e controle de vendas" },
+  { icon: LineChart, label: "Financeiro e indicadores em tempo real" },
+];
+
 const Auth = () => {
   const { user, loading, signIn, signUp } = useAuth();
-  const { branding } = useBranding();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,8 +35,8 @@ const Auth = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-sidebar">
-        <Loader2 className="h-8 w-8 animate-spin text-sidebar-primary" />
+      <div className="flex min-h-svh items-center justify-center bg-[#014260]">
+        <Loader2 className="h-8 w-8 animate-spin text-white/80" />
       </div>
     );
   }
@@ -58,94 +68,65 @@ const Auth = () => {
     }
   };
 
-  const appName = branding.app_name || "Embio Comercial";
-  const slogan = branding.slogan || "Biotecnologia · Agropecuária";
-
   return (
-    <div className="flex min-h-svh">
-      {/* Left panel — brand identity */}
-      <div className="hidden lg:flex flex-col justify-between w-[420px] shrink-0 bg-sidebar px-10 py-12 relative overflow-hidden">
-        {/* Background texture */}
+    <div className="flex min-h-svh flex-col lg:flex-row">
+      {/* Desktop left panel — fixed platform identity, never per-tenant branding */}
+      <div className="hidden lg:flex flex-col justify-between w-[440px] shrink-0 bg-[#014260] px-10 py-12 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-sidebar-primary/8 blur-3xl" />
-          <div className="absolute bottom-16 -right-16 h-48 w-48 rounded-full bg-accent/6 blur-2xl" />
+          <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-white/[0.04] blur-3xl" />
+          <div className="absolute bottom-16 -right-16 h-48 w-48 rounded-full bg-[#61B24C]/10 blur-2xl" />
         </div>
 
-        {/* Logo + name */}
         <div className="relative flex items-center gap-3">
-          {branding.logo_url ? (
-            <img
-              src={branding.logo_url}
-              alt={appName}
-              className="h-10 w-10 rounded-xl object-contain"
-            />
-          ) : (
-            <div className="h-10 w-10 rounded-xl bg-sidebar-primary/20 flex items-center justify-center">
-              <Wheat className="h-5 w-5 text-sidebar-primary" />
-            </div>
-          )}
+          <img
+            src="/web-app-manifest-512x512.png"
+            alt={APP_NAME}
+            className="h-11 w-11 rounded-xl object-contain"
+          />
           <div>
-            <p className="text-sm font-bold text-sidebar-foreground leading-tight">{appName}</p>
-            <p className="text-[10px] text-sidebar-foreground/40 leading-tight mt-0.5">{slogan}</p>
+            <p className="text-sm font-bold text-white leading-tight">{APP_NAME}</p>
+            <p className="text-[10px] text-white/40 leading-tight mt-0.5">{NICHE_TAG}</p>
           </div>
         </div>
 
-        {/* Center content */}
         <div className="relative space-y-6">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <FlaskConical className="h-5 w-5 text-sidebar-primary" />
-              <span className="text-[11px] font-bold uppercase tracking-widest text-sidebar-primary">
-                Plataforma Comercial
-              </span>
-            </div>
-            <h2 className="text-2xl font-bold text-sidebar-foreground leading-snug">
-              Gestão completa para<br />o agronegócio.
-            </h2>
-            <p className="text-sm text-sidebar-foreground/45 leading-relaxed">
-              Orçamentos, clientes, agenda e indicadores — tudo integrado em uma plataforma profissional.
-            </p>
+            <span className="text-[11px] font-bold uppercase tracking-widest text-[#7BC960]">
+              Plataforma Comercial
+            </span>
+            <h2 className="text-2xl font-bold text-white leading-snug">{HEADLINE}</h2>
+            <p className="text-sm text-white/50 leading-relaxed">{SUBHEADLINE}</p>
           </div>
 
           <div className="space-y-3">
-            {[
-              "Orçamentos técnicos com PDF",
-              "Dimensionamento de lagoas",
-              "Agenda comercial de campo",
-              "Indicadores em tempo real",
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-2.5">
-                <div className="h-1.5 w-1.5 rounded-full bg-sidebar-primary shrink-0" />
-                <span className="text-[13px] text-sidebar-foreground/60">{item}</span>
+            {BENEFITS.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-2.5">
+                <Icon className="h-4 w-4 text-[#7BC960] shrink-0" />
+                <span className="text-[13px] text-white/70">{label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="relative">
-          <p className="text-[10px] text-sidebar-foreground/25 uppercase tracking-widest mb-1">
-            {branding.company_name || "Embio"} · Sistema Interno
-          </p>
-          <FFRFooter className="py-1 justify-start" />
+        <div className="relative h-6" aria-hidden />
+      </div>
+
+      {/* Mobile header — compact, own layout, not a shrunk desktop panel */}
+      <div className="flex lg:hidden flex-col items-center gap-3 bg-[#014260] px-6 pt-10 pb-8">
+        <img
+          src="/web-app-manifest-512x512.png"
+          alt={APP_NAME}
+          className="h-14 w-14 rounded-2xl object-contain"
+        />
+        <div className="text-center">
+          <p className="text-base font-bold text-white">{APP_NAME}</p>
+          <p className="text-[11px] text-white/50 mt-1 max-w-[260px]">{SUBHEADLINE}</p>
         </div>
       </div>
 
-      {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center bg-background p-6">
+      {/* Form column */}
+      <div className="flex-1 flex items-center justify-center bg-background px-6 py-8">
         <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="flex lg:hidden items-center justify-center gap-2.5 mb-8">
-            {branding.logo_url ? (
-              <img src={branding.logo_url} alt={appName} className="h-8 w-8 rounded-lg object-contain" />
-            ) : (
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Wheat className="h-4 w-4 text-primary" />
-              </div>
-            )}
-            <p className="font-bold text-foreground">{appName}</p>
-          </div>
-
           <div className="space-y-1 mb-8">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               {isLogin ? "Entrar na conta" : "Criar conta"}
@@ -170,7 +151,7 @@ const Auth = () => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required={!isLogin}
-                  className="h-11 rounded-xl"
+                  className="h-12 rounded-xl text-base"
                   autoComplete="name"
                 />
               </div>
@@ -187,7 +168,7 @@ const Auth = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-11 rounded-xl"
+                className="h-12 rounded-xl text-base"
                 autoComplete="email"
               />
             </div>
@@ -205,7 +186,7 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="h-11 rounded-xl pr-10"
+                  className="h-12 rounded-xl text-base pr-10"
                   autoComplete={isLogin ? "current-password" : "new-password"}
                 />
                 <button
@@ -223,7 +204,7 @@ const Auth = () => {
             <Button
               type="submit"
               className={cn(
-                "w-full h-11 gap-2 rounded-xl font-semibold text-[15px] mt-2",
+                "w-full h-12 gap-2 rounded-xl font-semibold text-base mt-2",
                 "transition-all duration-200 hover:shadow-lg",
               )}
               disabled={submitting}
