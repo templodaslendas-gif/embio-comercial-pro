@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface PremiumSectionProps {
@@ -9,18 +10,26 @@ interface PremiumSectionProps {
 }
 
 export function PremiumSection({ label, description, action, children, className }: PremiumSectionProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <section className={cn("space-y-4", className)}>
+    <motion.section
+      className={cn("space-y-4", className)}
+      initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-3">
-          <p className="text-sm font-bold uppercase tracking-wider text-accent/80">{label}</p>
+          <p className="text-section-label">{label}</p>
           {description && (
-            <p className="text-xs text-muted-foreground/50">{description}</p>
+            <p className="text-xs text-muted-foreground/55">{description}</p>
           )}
         </div>
         {action}
       </div>
       {children}
-    </section>
+    </motion.section>
   );
 }

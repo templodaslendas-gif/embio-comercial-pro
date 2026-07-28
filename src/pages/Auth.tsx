@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,8 @@ import { FFRFooter } from "@/components/FFRFooter";
 const APP_NAME = "Embio Intelligence Pro";
 const HEADLINE = "Gestão inteligente de clientes, propostas e vendas.";
 const SUBHEADLINE =
-  "Centralize relacionamento, agenda, financeiro e performance comercial em uma única plataforma.";
-const NICHE_TAG = "Especializado no relacionamento comercial do segmento suíno.";
+  "Centralize relacionamento, agenda, propostas e indicadores em uma única plataforma.";
+const TAGLINE = "Venda mais. Organize melhor. Acompanhe tudo.";
 
 const BENEFITS = [
   { icon: Users, label: "Gestão de clientes e relacionamento" },
@@ -32,10 +33,11 @@ const Auth = () => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
 
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-[#014260]">
+      <div className="flex min-h-svh items-center justify-center bg-embio-blue">
         <Loader2 className="h-8 w-8 animate-spin text-white/80" />
       </div>
     );
@@ -71,38 +73,38 @@ const Auth = () => {
   return (
     <div className="flex min-h-svh flex-col lg:flex-row">
       {/* Desktop left panel — fixed platform identity, never per-tenant branding */}
-      <div className="hidden lg:flex flex-col justify-between w-[440px] shrink-0 bg-[#014260] px-10 py-12 relative overflow-hidden">
+      <div className="hidden lg:flex flex-col justify-between w-[460px] shrink-0 bg-embio-blue px-10 py-12 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-white/[0.04] blur-3xl" />
-          <div className="absolute bottom-16 -right-16 h-48 w-48 rounded-full bg-[#61B24C]/10 blur-2xl" />
+          <div className="absolute bottom-16 -right-16 h-48 w-48 rounded-full bg-accent/10 blur-2xl" />
         </div>
 
-        <div className="relative flex items-center gap-3">
+        <div className="relative flex items-center gap-4">
           <img
             src="/web-app-manifest-512x512.png"
             alt={APP_NAME}
-            className="h-11 w-11 rounded-xl object-contain"
+            className="h-16 w-16 rounded-2xl object-contain shadow-lg ring-1 ring-white/10"
           />
           <div>
-            <p className="text-sm font-bold text-white leading-tight">{APP_NAME}</p>
-            <p className="text-[10px] text-white/40 leading-tight mt-0.5">{NICHE_TAG}</p>
+            <p className="text-lg font-bold text-white leading-tight">{APP_NAME}</p>
+            <p className="text-[13px] text-white/55 leading-tight mt-1">{TAGLINE}</p>
           </div>
         </div>
 
         <div className="relative space-y-6">
           <div className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-[#7BC960]">
+            <span className="text-[13px] font-bold uppercase tracking-widest text-[#8FDA76]">
               Plataforma Comercial
             </span>
             <h2 className="text-2xl font-bold text-white leading-snug">{HEADLINE}</h2>
-            <p className="text-sm text-white/50 leading-relaxed">{SUBHEADLINE}</p>
+            <p className="text-sm text-white/55 leading-relaxed">{SUBHEADLINE}</p>
           </div>
 
           <div className="space-y-3">
             {BENEFITS.map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-2.5">
-                <Icon className="h-4 w-4 text-[#7BC960] shrink-0" />
-                <span className="text-[13px] text-white/70">{label}</span>
+                <Icon className="h-4 w-4 text-[#8FDA76] shrink-0" />
+                <span className="text-[13px] text-white/75">{label}</span>
               </div>
             ))}
           </div>
@@ -111,22 +113,28 @@ const Auth = () => {
         <div className="relative h-6" aria-hidden />
       </div>
 
-      {/* Mobile header — compact, own layout, not a shrunk desktop panel */}
-      <div className="flex lg:hidden flex-col items-center gap-3 bg-[#014260] px-6 pt-10 pb-8">
+      {/* Mobile header — own vertical layout, not a shrunk desktop panel */}
+      <div className="flex lg:hidden flex-col items-center gap-3 bg-embio-blue px-6 pt-10 pb-8">
         <img
           src="/web-app-manifest-512x512.png"
           alt={APP_NAME}
-          className="h-14 w-14 rounded-2xl object-contain"
+          className="h-20 w-20 rounded-2xl object-contain shadow-lg ring-1 ring-white/10"
         />
-        <div className="text-center">
-          <p className="text-base font-bold text-white">{APP_NAME}</p>
-          <p className="text-[11px] text-white/50 mt-1 max-w-[260px]">{SUBHEADLINE}</p>
+        <div className="text-center space-y-1.5">
+          <p className="text-lg font-bold text-white">{APP_NAME}</p>
+          <p className="text-[13px] text-white/70 font-medium">{TAGLINE}</p>
+          <p className="text-[13px] text-white/50 mt-1 max-w-[280px] leading-relaxed">{SUBHEADLINE}</p>
         </div>
       </div>
 
       {/* Form column */}
       <div className="flex-1 flex items-center justify-center bg-background px-6 py-8">
-        <div className="w-full max-w-sm">
+        <motion.div
+          className="w-full max-w-sm"
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        >
           <div className="space-y-1 mb-8">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               {isLogin ? "Entrar na conta" : "Criar conta"}
@@ -234,7 +242,7 @@ const Auth = () => {
             </button>
           </div>
           <FFRFooter className="mt-8" />
-        </div>
+        </motion.div>
       </div>
     </div>
   );

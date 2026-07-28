@@ -16,12 +16,12 @@ export function PremiumChartCard({ title, subtitle, icon: Icon, children, classN
     )}>
       <div className="flex items-start justify-between mb-5">
         <div>
-          <p className="text-[13px] font-semibold text-foreground">{title}</p>
+          <p className="text-sm font-semibold text-foreground">{title}</p>
           {subtitle && (
-            <p className="text-[11px] text-muted-foreground/60 mt-0.5">{subtitle}</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">{subtitle}</p>
           )}
         </div>
-        {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground/30 mt-0.5" />}
+        {Icon && <Icon className="h-4 w-4 text-muted-foreground/35 mt-0.5" />}
       </div>
       {children}
     </div>

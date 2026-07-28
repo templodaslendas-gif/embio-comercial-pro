@@ -17,13 +17,14 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 
 const nav =
-  "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 text-[13.5px] text-slate-100 transition-colors duration-150 hover:bg-white/10 hover:text-white";
-const navActive = "bg-green-600 text-white font-semibold shadow-md";
+  "flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2.5 text-[14px] text-slate-200 transition-all duration-200 hover:bg-white/10 hover:text-white";
+const navActive =
+  "bg-sidebar-primary/14 text-white font-semibold shadow-[inset_2px_0_0_0_hsl(var(--sidebar-primary)),0_2px_10px_-4px_hsl(var(--sidebar-primary)/0.4)]";
 const subNav =
-  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[12.5px] text-slate-300 transition-colors duration-150 hover:bg-white/8 hover:text-green-400";
-const subNavActive = "text-green-400 font-semibold";
+  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[13px] text-slate-300 transition-colors duration-150 hover:bg-white/8 hover:text-sidebar-primary";
+const subNavActive = "text-sidebar-primary font-semibold";
 
-const Divider = () => <div className="mx-3 my-2.5 border-t border-white/10" />;
+const Divider = () => <div className="mx-3 my-3.5 border-t border-white/10" />;
 
 const GROUP_COLORS = {
   green: "text-green-400",
@@ -33,7 +34,7 @@ const GROUP_COLORS = {
 } as const;
 
 const GroupLabel = ({ children, color = "green" }: { children: React.ReactNode; color?: keyof typeof GROUP_COLORS }) => (
-  <div className={`px-3 pb-1 pt-2 text-[10.5px] uppercase tracking-widest font-extrabold select-none ${GROUP_COLORS[color]}`}>
+  <div className={`px-3 pb-1.5 pt-3 text-xs uppercase tracking-wider font-bold select-none ${GROUP_COLORS[color]}`}>
     {children}
   </div>
 );
@@ -45,26 +46,26 @@ export function AppSidebar() {
   const { branding } = useBranding();
 
   return (
-    <Sidebar className="border-r border-border/50">
-      <SidebarHeader className="px-4 py-4 border-b border-border/30">
+    <Sidebar className="border-r border-sidebar-border">
+      <SidebarHeader className="px-4 py-4 border-b border-sidebar-border">
         <div className="flex items-center gap-2.5">
           {branding.logo_url ? (
             <img
               src={branding.logo_url}
               alt={branding.app_name}
-              className="h-7 w-7 rounded-md object-contain"
+              className="h-8 w-8 rounded-md object-contain"
             />
           ) : (
-            <div className="h-7 w-7 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
+            <div className="h-8 w-8 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
               <Wheat className="h-4 w-4 text-white" />
             </div>
           )}
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-sidebar-foreground truncate leading-tight">
+            <p className="text-sm font-semibold text-sidebar-foreground truncate leading-tight">
               {branding.app_name}
             </p>
-            <p className="text-[10px] text-sidebar-foreground/35 truncate leading-tight mt-0.5">
-              {branding.slogan || "Biotecnologia · Agropecuária"}
+            <p className="text-xs text-sidebar-foreground/45 truncate leading-tight mt-0.5">
+              {branding.slogan || "Gestão comercial inteligente"}
             </p>
           </div>
         </div>
@@ -135,7 +136,7 @@ export function AppSidebar() {
                     <ChevronRight className={cn("h-3 w-3 opacity-40 transition-transform duration-200", produtosOpen && "rotate-90")} />
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <ul className="ml-5 mt-0.5 space-y-0.5 border-l border-border/30 pl-3">
+                    <ul className="ml-5 mt-0.5 space-y-0.5 border-l border-sidebar-border/60 pl-3">
                       {[
                         { title: "Embio 3100", url: "/produtos/embio-3100", icon: FlaskConical },
                         { title: "Embio 3000", url: "/produtos/embio-3000", icon: Droplets },
@@ -165,7 +166,7 @@ export function AppSidebar() {
                     <ChevronRight className={cn("h-3 w-3 opacity-40 transition-transform duration-200", propulsoresOpen && "rotate-90")} />
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <ul className="ml-5 mt-0.5 space-y-0.5 border-l border-border/30 pl-3">
+                    <ul className="ml-5 mt-0.5 space-y-0.5 border-l border-sidebar-border/60 pl-3">
                       {[
                         { title: "3 CV", url: "/propulsores/3cv" },
                         { title: "4 CV", url: "/propulsores/4cv" },
@@ -229,8 +230,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="px-4 py-3 border-t border-border/30">
-        <p className="text-[10px] text-sidebar-foreground/25 text-center">{t("sidebar.copyright")}</p>
+      <SidebarFooter className="px-4 py-3.5 border-t border-white/10">
+        <p className="text-xs text-sidebar-foreground/35 text-center">{t("sidebar.copyright")}</p>
       </SidebarFooter>
     </Sidebar>
   );

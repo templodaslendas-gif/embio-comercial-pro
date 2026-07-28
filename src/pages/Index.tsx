@@ -9,16 +9,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   FileText, CheckCircle2, Clock, XCircle, ChevronDown, ChevronUp,
   Plus, UserCheck, LayoutList, CalendarDays, Inbox, TrendingUp, PieChart as PieIconLucide,
-  Receipt, Landmark,
+  Receipt, Landmark, Target, GitBranch,
 } from "lucide-react";
 import { fetchCatalogo } from "@/lib/orcamentoQueries";
 import { fetchClientes } from "@/lib/clientesQueries";
 import { fetchServicos } from "@/lib/agendaQueries";
 import { fetchOrcamentos } from "@/lib/orcamentosComercialQueries";
-import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import {
+  AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
+  FunnelChart, Funnel, LabelList, RadialBarChart, RadialBar, PolarAngleAxis,
+} from "recharts";
 import { cn, safeMoney } from "@/lib/utils";
 import {
-  PremiumPage, PremiumSection, PremiumChartCard, PremiumEmptyState,
+  PremiumPage, PremiumSection, PremiumCard, PremiumChartCard, PremiumEmptyState,
   PremiumAction, PremiumWeather, useCountUp,
 } from "@/components/premium";
 
@@ -33,10 +36,10 @@ const Num = ({ v }: { v: number }) => <>{useCountUp(v)}</>;
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const METRIC_CFG: Record<string, { card: string; icon: string; value: string; label: string }> = {
-  feitos:     { card: "bg-gradient-to-br from-[hsl(210,70%,22%)] to-[hsl(215,65%,18%)] shadow-[0_4px_14px_hsl(210_70%_22%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/60" },
+  feitos:     { card: "bg-gradient-to-br from-[hsl(199,90%,20%)] to-[hsl(199,80%,15%)] shadow-[0_4px_14px_hsl(199_90%_20%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/60" },
   fechados:   { card: "bg-gradient-to-br from-[hsl(120,55%,32%)] to-[hsl(140,50%,26%)] shadow-[0_4px_14px_hsl(120_55%_32%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/60" },
   aberto:     { card: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_4px_14px_hsl(38_92%_50%/0.3)]", icon: "text-white/70", value: "text-white", label: "text-white/60" },
-  finalizados:{ card: "border border-border/60 bg-card shadow-[0_1px_3px_hsl(210_20%_20%/0.06)]", icon: "text-muted-foreground/55", value: "text-foreground", label: "text-muted-foreground/55" },
+  finalizados:{ card: "border border-border/60 bg-card shadow-[0_1px_3px_hsl(199_30%_15%/0.07)]", icon: "text-muted-foreground/55", value: "text-foreground", label: "text-muted-foreground/55" },
 };
 
 const Index = () => {
@@ -111,7 +114,7 @@ const Index = () => {
   const statusMix = useMemo(() => [
     { name: t("dashboard.statusApproved"), value: fechados.length,    color: "hsl(120, 55%, 38%)" },
     { name: t("dashboard.statusOpen"),     value: emAberto.length,    color: "hsl(38, 92%, 50%)" },
-    { name: t("dashboard.statusFinished"), value: finalizados.length, color: "hsl(210, 20%, 72%)" },
+    { name: t("dashboard.statusFinished"), value: finalizados.length, color: "hsl(199, 20%, 72%)" },
   ], [fechados.length, emAberto.length, finalizados.length, t]);
 
   const { data: catalogoItens = [] } = useQuery({ queryKey: ["catalogo"], queryFn: fetchCatalogo, staleTime: 5 * 60 * 1000 });
@@ -125,6 +128,25 @@ const Index = () => {
         .reduce((s, o) => s + safeMoney(o.total), 0),
     [orcamentosData],
   );
+
+  const propostasStats = useMemo(() => {
+    const fechadasList = orcamentosData.filter((o) => o.status === "aprovado" || o.status === "finalizado");
+    return {
+      total: orcamentosData.length,
+      fechadas: fechadasList.length,
+      finalizadas: orcamentosData.filter((o) => o.status === "finalizado").length,
+    };
+  }, [orcamentosData]);
+
+  const funnelData = useMemo(() => ([
+    { name: "Propostas criadas", value: propostasStats.total,       fill: "hsl(199, 90%, 22%)" },
+    { name: "Aprovadas",         value: propostasStats.fechadas,    fill: "hsl(120, 55%, 40%)" },
+    { name: "Finalizadas",       value: propostasStats.finalizadas, fill: "hsl(120, 55%, 55%)" },
+  ]), [propostasStats]);
+
+  const metaMensal = branding.meta_mensal;
+  const metaPct = metaMensal ? Math.min(100, Math.round((totalVendido / metaMensal) * 100)) : 0;
+  const metaGaugeData = useMemo(() => ([{ name: "meta", value: metaPct, fill: "hsl(120, 55%, 40%)" }]), [metaPct]);
 
   const catalogoStats = useMemo(() => ({
     total:      catalogoItens.length,
@@ -179,45 +201,7 @@ const Index = () => {
           <PremiumWeather showSummary />
         </PremiumSection>
 
-        {/* 2. MÓDULOS COMERCIAIS */}
-        <PremiumSection label="Módulos Comerciais">
-          <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
-            {[
-              { to: "/clientes",       icon: UserCheck,    title: "Clientes",   subtitle: "Propriedades · Produtores",  value: clientesStats.total,   detail: `${clientesStats.ativos} ativos · ${clientesStats.cidades} cidades`,   iconBg: "bg-[hsl(210,70%,22%)] text-white" },
-              { to: "/catalogo",       icon: LayoutList,   title: "Catálogo",   subtitle: "Produtos · Serviços",        value: catalogoStats.total,   detail: `${catalogoStats.ativos} ativos · ${catalogoStats.categorias} categ.`,  iconBg: "bg-accent text-white" },
-              { to: "/agenda",         icon: CalendarDays, title: "Agenda",     subtitle: "Visitas Técnicas · Campo",   value: agendaStats.agendados, detail: `${agendaStats.concluidos} concluídas · ${agendaStats.hoje} hoje`,      iconBg: "bg-amber-500 text-white" },
-              { to: "/orcamentos",     icon: FileText,     title: "Orçamentos", subtitle: "Comerciais · Gestão",        value: orcamentosData.length, detail: `${orcamentosData.filter(o => o.status === "aprovado" || o.status === "finalizado").length} aprovados · ${orcamentosData.filter(o => o.status === "em_aberto").length} abertos`, iconBg: "bg-teal-600 text-white" },
-              { to: "/orcamentos",     icon: Receipt,      title: "Propostas",  subtitle: "Comerciais · Negociações",   value: orcamentosData.length, detail: `${orcamentosData.filter(o => o.status === "aprovado" || o.status === "finalizado").length} aprovadas · ${brl(totalVendido)}`, iconBg: "bg-indigo-600 text-white" },
-              { to: "/financeiro",     icon: Landmark,     title: "Financeiro", subtitle: "Painel · Metas Comerciais",  value: orcamentosData.filter(o => o.status === "aprovado" || o.status === "finalizado").length, detail: `Total aprovado: ${brl(totalVendido)}`, iconBg: "bg-emerald-600 text-white" },
-            ].map((card) => (
-              <Link key={card.to} to={card.to} className="group block rounded-xl border border-border/60 bg-card p-5 transition-all duration-150 hover:border-accent/35 hover:shadow-md hover:-translate-y-0.5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={cn("h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm", card.iconBg)}>
-                    <card.icon className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground leading-none">{card.title}</p>
-                    <p className="text-xs text-muted-foreground/65 mt-1">{card.subtitle}</p>
-                  </div>
-                </div>
-                <p className="text-3xl font-bold tabular-nums leading-none text-foreground"><Num v={card.value} /></p>
-                <p className="text-xs text-muted-foreground/65 mt-2 leading-snug">{card.detail}</p>
-              </Link>
-            ))}
-          </div>
-        </PremiumSection>
-
-        {/* 3. AÇÕES RÁPIDAS */}
-        <PremiumSection label="Ações Rápidas">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <PremiumAction icon={Plus}         label="Novo Orçamento" description="Orçamento técnico Embio"        to="/novo-orcamento" />
-            <PremiumAction icon={UserCheck}    label="Novo Cliente"   description="Propriedade ou produtor"        to="/clientes" />
-            <PremiumAction icon={LayoutList}   label="Catálogo"       description="Produtos, serviços e aditivos"  to="/catalogo" />
-            <PremiumAction icon={CalendarDays} label="Agenda"         description="Visitas e atendimentos"         to="/agenda" />
-          </div>
-        </PremiumSection>
-
-        {/* 4. ORÇAMENTOS */}
+        {/* 2. KPIs PRINCIPAIS */}
         <PremiumSection label="Orçamentos Técnicos">
           <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
             {metricCards.map((m) => {
@@ -226,7 +210,7 @@ const Index = () => {
                 <button key={m.id} onClick={() => toggle(m.id)} className={cn(
                   "rounded-xl p-5 text-left transition-all duration-150 hover:-translate-y-0.5 active:translate-y-0",
                   cfg.card,
-                  expandedCard === m.id && "ring-2 ring-white/15 shadow-xl scale-[1.01]",
+                  expandedCard === m.id && "glow-accent scale-[1.01]",
                 )}>
                   <div className="flex items-center justify-between mb-4">
                     <m.icon className={cn("h-5 w-5", cfg.icon)} />
@@ -234,7 +218,7 @@ const Index = () => {
                       ? <ChevronUp className={cn("h-4 w-4", cfg.icon)} />
                       : <ChevronDown className={cn("h-4 w-4 opacity-40", cfg.icon)} />}
                   </div>
-                  <p className={cn("text-4xl font-bold tabular-nums leading-none", cfg.value)}><Num v={m.value} /></p>
+                  <p className={cn("text-kpi-value", cfg.value)}><Num v={m.value} /></p>
                   <p className={cn("text-sm mt-2.5", cfg.label)}>{m.label}</p>
                 </button>
               );
@@ -275,7 +259,7 @@ const Index = () => {
           )}
         </PremiumSection>
 
-        {/* 6. GRÁFICOS */}
+        {/* 3. GRÁFICOS — só os que ajudam a entender vendas/propostas/desempenho */}
         <PremiumSection label="Análise Comercial">
           <div className="grid gap-4 grid-cols-1 md:grid-cols-[1fr_280px]">
             <PremiumChartCard title="Evolução" subtitle="Orçamentos · últimos 30 dias" icon={TrendingUp}>
@@ -293,7 +277,7 @@ const Index = () => {
                       </defs>
                       <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground) / 0.6)" }} axisLine={false} tickLine={false} interval={Math.ceil(evolution.length / 5)} />
                       <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} labelStyle={{ color: "hsl(var(--muted-foreground))" }} cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1 }} />
-                      <Area type="monotone" dataKey="count" stroke="hsl(var(--accent))" strokeWidth={2} fill="url(#aGrad)" dot={false} activeDot={{ r: 4, fill: "hsl(var(--accent))", strokeWidth: 0 }} />
+                      <Area type="monotone" dataKey="count" stroke="hsl(var(--accent))" strokeWidth={2} fill="url(#aGrad)" dot={false} activeDot={{ r: 4, fill: "hsl(var(--accent))", strokeWidth: 0 }} isAnimationActive animationDuration={700} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -307,7 +291,7 @@ const Index = () => {
                   <div className="h-32 w-32 mx-auto">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={statusMix} dataKey="value" innerRadius={36} outerRadius={58} paddingAngle={2} stroke="none">
+                        <Pie data={statusMix} dataKey="value" innerRadius={36} outerRadius={58} paddingAngle={2} stroke="none" isAnimationActive animationDuration={700}>
                           {statusMix.map((s, i) => <Cell key={i} fill={s.color} />)}
                         </Pie>
                         <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
@@ -328,6 +312,102 @@ const Index = () => {
                 </div>
               )}
             </PremiumChartCard>
+          </div>
+
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+            <PremiumChartCard title="Funil de Propostas" subtitle="Da criação à finalização" icon={GitBranch}>
+              {propostasStats.total === 0 ? (
+                <PremiumEmptyState icon={Inbox} title="Sem propostas ainda" description="O funil aparece conforme propostas comerciais forem criadas." size="sm" />
+              ) : (
+                <div className="h-40">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <FunnelChart>
+                      <Tooltip
+                        formatter={(value: number) => [`${value} propostas`, ""]}
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                      />
+                      <Funnel dataKey="value" data={funnelData} isAnimationActive animationDuration={700}>
+                        <LabelList position="right" dataKey="name" fill="hsl(var(--muted-foreground))" stroke="none" fontSize={12} />
+                        <LabelList position="center" dataKey="value" fill="#fff" stroke="none" fontSize={13} fontWeight={700} />
+                      </Funnel>
+                    </FunnelChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </PremiumChartCard>
+
+            <PremiumChartCard title="Meta x Realizado" subtitle="Vendido no mês vs. meta" icon={Target}>
+              {!metaMensal ? (
+                <PremiumEmptyState
+                  icon={Target}
+                  title="Meta não definida"
+                  description="Defina uma meta mensal em Configurações de Marca para acompanhar aqui."
+                  size="sm"
+                />
+              ) : (
+                <div className="flex items-center gap-4">
+                  <div className="h-28 w-28 shrink-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadialBarChart
+                        innerRadius="70%"
+                        outerRadius="100%"
+                        data={metaGaugeData}
+                        startAngle={90}
+                        endAngle={-270}
+                      >
+                        <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+                        <RadialBar dataKey="value" cornerRadius={8} isAnimationActive animationDuration={700} background={{ fill: "hsl(var(--muted))" }} />
+                      </RadialBarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="text-kpi-value text-2xl md:text-3xl">{metaPct}%</p>
+                    <p className="text-xs text-muted-foreground/70 leading-snug">
+                      {brl(totalVendido)} de {brl(metaMensal)}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </PremiumChartCard>
+          </div>
+        </PremiumSection>
+
+        {/* 4. AÇÕES RÁPIDAS */}
+        <PremiumSection label="Ações Rápidas">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <PremiumAction icon={Plus}         label="Novo Orçamento" description="Orçamento técnico Embio"        to="/novo-orcamento" />
+            <PremiumAction icon={UserCheck}    label="Novo Cliente"   description="Propriedade ou produtor"        to="/clientes" />
+            <PremiumAction icon={LayoutList}   label="Catálogo"       description="Produtos, serviços e aditivos"  to="/catalogo" />
+            <PremiumAction icon={CalendarDays} label="Agenda"         description="Visitas e atendimentos"         to="/agenda" />
+          </div>
+        </PremiumSection>
+
+        {/* 5. MÓDULOS — visão geral e acesso rápido (sem duplicar Orçamentos/Propostas) */}
+        <PremiumSection label="Módulos Comerciais">
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
+            {[
+              { to: "/clientes",   icon: UserCheck,    title: "Clientes",   subtitle: "Propriedades · Produtores", value: clientesStats.total,   detail: `${clientesStats.ativos} ativos · ${clientesStats.cidades} cidades`, iconBg: "bg-primary text-white" },
+              { to: "/catalogo",   icon: LayoutList,   title: "Catálogo",   subtitle: "Produtos · Serviços",       value: catalogoStats.total,   detail: `${catalogoStats.ativos} ativos · ${catalogoStats.categorias} categ.`, iconBg: "bg-accent text-white" },
+              { to: "/agenda",     icon: CalendarDays, title: "Agenda",     subtitle: "Visitas Técnicas · Campo",  value: agendaStats.agendados, detail: `${agendaStats.concluidos} concluídas · ${agendaStats.hoje} hoje`, iconBg: "bg-amber-500 text-white" },
+              { to: "/orcamentos", icon: Receipt,      title: "Propostas",  subtitle: "Comerciais · Negociações",  value: propostasStats.total,  detail: `${propostasStats.fechadas} aprovadas · ${brl(totalVendido)}`, iconBg: "bg-teal-600 text-white" },
+              { to: "/financeiro", icon: Landmark,     title: "Financeiro", subtitle: "Painel · Metas Comerciais", value: propostasStats.fechadas, detail: `Total aprovado: ${brl(totalVendido)}`, iconBg: "bg-emerald-600 text-white" },
+            ].map((card) => (
+              <Link key={card.to} to={card.to}>
+                <PremiumCard hover className="group h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={cn("h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm", card.iconBg)}>
+                      <card.icon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground leading-none">{card.title}</p>
+                      <p className="text-xs text-muted-foreground/65 mt-1">{card.subtitle}</p>
+                    </div>
+                  </div>
+                  <p className="text-kpi-value text-3xl text-foreground"><Num v={card.value} /></p>
+                  <p className="text-xs text-muted-foreground/65 mt-2 leading-snug">{card.detail}</p>
+                </PremiumCard>
+              </Link>
+            ))}
           </div>
         </PremiumSection>
 

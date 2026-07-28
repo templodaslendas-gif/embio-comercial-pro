@@ -29,7 +29,7 @@ export function PremiumEmptyState({
       <div>
         <p className="text-sm font-medium text-foreground/65">{title}</p>
         {description && (
-          <p className="text-[11px] text-muted-foreground/50 mt-0.5 max-w-[200px] leading-snug">{description}</p>
+          <p className="text-xs text-muted-foreground/50 mt-0.5 max-w-[220px] leading-snug">{description}</p>
         )}
       </div>
       {action}

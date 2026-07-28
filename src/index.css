@@ -6,23 +6,23 @@
 
 @layer base {
   :root {
-    --background: 210 20% 94%;
-    --foreground: 210 50% 12%;
+    --background: 199 22% 95%;
+    --foreground: 199 45% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 50% 12%;
+    --card-foreground: 199 45% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 50% 12%;
+    --popover-foreground: 199 45% 13%;
 
-    --primary: 210 70% 25%;
+    --primary: 199 98% 19%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 93%;
-    --secondary-foreground: 210 70% 20%;
+    --secondary: 199 20% 93%;
+    --secondary-foreground: 199 70% 18%;
 
-    --muted: 210 12% 94%;
-    --muted-foreground: 210 8% 46%;
+    --muted: 199 14% 93%;
+    --muted-foreground: 199 8% 45%;
 
     --accent: 120 55% 38%;
     --accent-foreground: 0 0% 100%;
@@ -30,73 +30,79 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 12% 90%;
-    --input: 210 12% 87%;
-    --ring: 210 70% 45%;
+    --border: 199 14% 89%;
+    --input: 199 14% 86%;
+    --ring: 199 80% 32%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 210 55% 12%;
-    --sidebar-foreground: 210 12% 92%;
+    --sidebar-background: 199 78% 9%;
+    --sidebar-foreground: 199 15% 93%;
     --sidebar-primary: 120 55% 45%;
-    --sidebar-primary-foreground: 210 55% 8%;
-    --sidebar-accent: 210 40% 18%;
-    --sidebar-accent-foreground: 210 12% 96%;
-    --sidebar-border: 210 30% 20%;
+    --sidebar-primary-foreground: 199 78% 8%;
+    --sidebar-accent: 199 55% 16%;
+    --sidebar-accent-foreground: 199 15% 97%;
+    --sidebar-border: 199 45% 18%;
     --sidebar-ring: 120 55% 45%;
 
     /* Custom tokens */
-    --embio-green-deep: 210 70% 22%;
+    --embio-green-deep: 199 98% 17%;
     --embio-green-light: 120 45% 45%;
     --embio-lime: 120 55% 45%;
-    --embio-gray: 210 5% 60%;
-    --embio-surface: 210 8% 98%;
-    --embio-blue: 210 70% 30%;
+    --embio-gray: 199 6% 58%;
+    --embio-surface: 199 10% 98%;
+    --embio-blue: 199 98% 22%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(210, 70%, 25%), hsl(120, 55%, 38%));
-    --gradient-card: linear-gradient(180deg, hsl(210, 20%, 97%), hsl(0, 0%, 100%));
-    --shadow-card: 0 1px 3px 0 hsl(210 20% 20% / 0.06), 0 1px 2px -1px hsl(210 20% 20% / 0.06);
-    --shadow-card-hover: 0 10px 25px -5px hsl(210 20% 20% / 0.1), 0 8px 10px -6px hsl(210 20% 20% / 0.08);
-    --shadow-elevated: 0 20px 40px -12px hsl(210 20% 20% / 0.12);
+    --gradient-hero: linear-gradient(135deg, hsl(199, 98%, 19%), hsl(120, 55%, 38%));
+    --gradient-card: linear-gradient(180deg, hsl(199, 18%, 97%), hsl(0, 0%, 100%));
+    --shadow-card: 0 1px 3px 0 hsl(199 30% 15% / 0.07), 0 1px 2px -1px hsl(199 30% 15% / 0.06);
+    --shadow-card-hover: 0 10px 25px -5px hsl(199 30% 15% / 0.12), 0 8px 10px -6px hsl(199 30% 15% / 0.08);
+    --shadow-elevated: 0 20px 40px -12px hsl(199 30% 15% / 0.14);
+    --shadow-glow-accent: 0 0 0 3px hsl(var(--accent) / 0.14), 0 6px 20px -4px hsl(var(--accent) / 0.35);
+    --shadow-glow-primary: 0 0 0 3px hsl(var(--primary) / 0.14), 0 6px 20px -4px hsl(var(--primary) / 0.35);
   }
 
   .dark {
-    --background: 215 25% 8%;
-    --foreground: 210 15% 95%;
+    --background: 199 28% 7%;
+    --foreground: 199 15% 95%;
 
-    --card: 215 22% 13%;
-    --card-foreground: 210 15% 95%;
+    --card: 199 24% 11%;
+    --card-foreground: 199 15% 95%;
 
-    --popover: 215 22% 13%;
-    --popover-foreground: 210 15% 95%;
+    --popover: 199 24% 11%;
+    --popover-foreground: 199 15% 95%;
 
     --primary: 120 55% 50%;
-    --primary-foreground: 215 30% 8%;
+    --primary-foreground: 199 35% 7%;
 
-    --secondary: 215 22% 18%;
-    --secondary-foreground: 210 12% 90%;
+    --secondary: 199 24% 16%;
+    --secondary-foreground: 199 12% 90%;
 
-    --muted: 215 18% 17%;
-    --muted-foreground: 210 10% 62%;
+    --muted: 199 20% 15%;
+    --muted-foreground: 199 10% 63%;
 
-    --accent: 120 48% 44%;
+    --accent: 120 48% 46%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 20% 23%;
-    --input: 215 20% 19%;
+    --border: 199 22% 21%;
+    --input: 199 22% 17%;
     --ring: 120 55% 50%;
 
-    --sidebar-background: 215 28% 7%;
-    --sidebar-foreground: 210 12% 90%;
+    --sidebar-background: 199 32% 6%;
+    --sidebar-foreground: 199 12% 90%;
     --sidebar-primary: 120 55% 50%;
-    --sidebar-primary-foreground: 215 30% 8%;
-    --sidebar-accent: 215 25% 14%;
-    --sidebar-accent-foreground: 210 12% 94%;
-    --sidebar-border: 215 22% 15%;
+    --sidebar-primary-foreground: 199 35% 7%;
+    --sidebar-accent: 199 26% 13%;
+    --sidebar-accent-foreground: 199 12% 95%;
+    --sidebar-border: 199 24% 16%;
     --sidebar-ring: 120 55% 50%;
+
+    --shadow-card: 0 1px 3px 0 hsl(199 40% 2% / 0.4), 0 1px 2px -1px hsl(199 40% 2% / 0.4);
+    --shadow-card-hover: 0 10px 25px -5px hsl(199 40% 2% / 0.5), 0 8px 10px -6px hsl(199 40% 2% / 0.4);
+    --shadow-elevated: 0 20px 40px -12px hsl(199 40% 2% / 0.55);
   }
 }
 
@@ -141,5 +147,43 @@
   .hover-lift:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-card-hover);
+  }
+
+  .glow-accent {
+    box-shadow: var(--shadow-glow-accent);
+  }
+
+  .glow-primary {
+    box-shadow: var(--shadow-glow-primary);
+  }
+
+  /* Typography scale — shared across dashboard, sidebar, login (12px floor for readable text) */
+  .text-page-title {
+    @apply text-2xl md:text-3xl font-bold tracking-tight text-foreground;
+  }
+
+  .text-section-label {
+    @apply text-[13px] font-bold uppercase tracking-wide text-accent/85;
+  }
+
+  .text-card-label {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  .text-kpi-value {
+    @apply text-3xl md:text-4xl font-bold tabular-nums tracking-tight;
+  }
+
+  .text-nav-item {
+    @apply text-[13px] font-medium;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
