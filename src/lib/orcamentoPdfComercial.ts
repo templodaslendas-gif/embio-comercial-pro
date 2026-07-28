@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { BrandingSettings, hslToRgb, generatedByText } from "@/hooks/useBranding";
+import { BrandingSettings, hslToRgb, generatedByText, displayAppName } from "@/hooks/useBranding";
 import { OrcamentoComercial, OrcamentoItem } from "@/lib/orcamentosComercialQueries";
 
 const brl = (v: number) =>
@@ -37,7 +37,7 @@ export async function generateOrcamentoPdfComercial(
     : ([76, 138, 88] as [number, number, number]);
   const logoData = branding.logo_url ? await urlToDataUrl(branding.logo_url) : null;
 
-  const companyName = (branding.company_name || branding.app_name || "").trim();
+  const companyName = (branding.company_name || displayAppName(branding)).trim();
 
   // Footer rows
   type FRow = { kind: "title" | "contact"; text: string };

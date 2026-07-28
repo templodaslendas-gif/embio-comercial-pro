@@ -38,18 +38,18 @@ export function PremiumMetric({ value, label, suffix = "", size = "md", classNam
         {count}{suffix}
       </span>
       {label && (
-        <p className="text-[9px] uppercase tracking-wide text-muted-foreground/50 mt-1 leading-none">{label}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mt-1.5 leading-none">{label}</p>
       )}
     </div>
   );
 }
 
 const statVariants = {
-  default: { card: "border border-border/60 bg-card shadow-[0_1px_3px_hsl(210_20%_20%/0.06)]", value: "text-foreground", label: "text-muted-foreground/60" },
-  green:   { card: "bg-gradient-to-br from-[hsl(120,55%,32%)] to-[hsl(140,50%,25%)] shadow-[0_4px_14px_hsl(120_55%_32%/0.3)]", value: "text-white", label: "text-white/60" },
-  blue:    { card: "bg-gradient-to-br from-[hsl(210,70%,22%)] to-[hsl(215,65%,17%)] shadow-[0_4px_14px_hsl(210_70%_22%/0.3)]", value: "text-white", label: "text-white/60" },
-  orange:  { card: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_4px_14px_hsl(38_92%_50%/0.3)]", value: "text-white", label: "text-white/60" },
-  teal:    { card: "bg-gradient-to-br from-teal-600 to-teal-700 shadow-[0_4px_14px_hsl(173_55%_40%/0.3)]", value: "text-white", label: "text-white/60" },
+  default: { card: "border border-border/60 bg-card shadow-[0_1px_3px_hsl(199_30%_15%/0.07)]", value: "text-foreground", label: "text-muted-foreground" },
+  green:   { card: "bg-gradient-to-br from-[hsl(120,55%,32%)] to-[hsl(140,50%,25%)] shadow-[0_4px_14px_hsl(120_55%_32%/0.3)]", value: "text-white", label: "text-white/75" },
+  blue:    { card: "bg-gradient-to-br from-[hsl(199,90%,20%)] to-[hsl(199,80%,15%)] shadow-[0_4px_14px_hsl(199_90%_20%/0.3)]", value: "text-white", label: "text-white/75" },
+  orange:  { card: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_4px_14px_hsl(38_92%_50%/0.3)]", value: "text-white", label: "text-white/75" },
+  teal:    { card: "bg-gradient-to-br from-teal-600 to-teal-700 shadow-[0_4px_14px_hsl(173_55%_40%/0.3)]", value: "text-white", label: "text-white/75" },
 } as const;
 
 interface PremiumStatProps {
@@ -68,7 +68,7 @@ export function PremiumStat({ label, value, icon: Icon, variant = "default", suf
     <div className={cn("rounded-xl p-4", s.card, className)}>
       {Icon && <Icon className={cn("h-4 w-4 mb-2.5 opacity-70", s.value)} />}
       <p className={cn("text-3xl font-bold tabular-nums leading-none", s.value)}>{count}{suffix}</p>
-      <p className={cn("text-xs mt-1.5", s.label)}>{label}</p>
+      <p className={cn("text-sm font-medium mt-1.5", s.label)}>{label}</p>
     </div>
   );
 }

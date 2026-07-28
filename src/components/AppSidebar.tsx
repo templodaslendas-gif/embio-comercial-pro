@@ -6,7 +6,7 @@ import {
   FlaskConical, Flame, Rocket, Palette, LayoutList, Wheat,
   Receipt, Landmark,
 } from "lucide-react";
-import { useBranding } from "@/hooks/useBranding";
+import { useBranding, displayAppName } from "@/hooks/useBranding";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -21,7 +21,7 @@ const nav =
 const navActive =
   "bg-sidebar-primary/14 text-white font-semibold shadow-[inset_2px_0_0_0_hsl(var(--sidebar-primary)),0_2px_10px_-4px_hsl(var(--sidebar-primary)/0.4)]";
 const subNav =
-  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-[13px] text-slate-300 transition-colors duration-150 hover:bg-white/8 hover:text-sidebar-primary";
+  "flex items-center gap-2 w-full rounded-md px-2.5 py-1.5 text-sm text-slate-200 transition-colors duration-150 hover:bg-white/8 hover:text-sidebar-primary";
 const subNavActive = "text-sidebar-primary font-semibold";
 
 const Divider = () => <div className="mx-3 my-3.5 border-t border-white/10" />;
@@ -44,6 +44,7 @@ export function AppSidebar() {
   const [propulsoresOpen, setPropulsoresOpen] = useState(false);
   const { t } = useTranslation();
   const { branding } = useBranding();
+  const appName = displayAppName(branding);
 
   return (
     <Sidebar className="border-r border-sidebar-border">
@@ -52,7 +53,7 @@ export function AppSidebar() {
           {branding.logo_url ? (
             <img
               src={branding.logo_url}
-              alt={branding.app_name}
+              alt={appName}
               className="h-8 w-8 rounded-md object-contain"
             />
           ) : (
@@ -62,9 +63,9 @@ export function AppSidebar() {
           )}
           <div className="min-w-0">
             <p className="text-sm font-semibold text-sidebar-foreground truncate leading-tight">
-              {branding.app_name}
+              {appName}
             </p>
-            <p className="text-xs text-sidebar-foreground/45 truncate leading-tight mt-0.5">
+            <p className="text-sm text-sidebar-foreground/60 truncate leading-tight mt-0.5">
               {branding.slogan || "Gestão comercial inteligente"}
             </p>
           </div>

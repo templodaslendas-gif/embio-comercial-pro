@@ -6,14 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useBranding, hexToHsl, hslToHex } from "@/hooks/useBranding";
+import { useBranding, hexToHsl, hslToHex, displayAppName } from "@/hooks/useBranding";
 import { useToast } from "@/hooks/use-toast";
 import { formatCnpj, formatPhone } from "@/lib/format";
-import { Loader2, Upload, RotateCcw, Save, Palette, Building2, MessageCircle } from "lucide-react";
+import { Loader2, Upload, RotateCcw, Save, Palette, Building2, MessageCircle, ImageOff } from "lucide-react";
 
-const DEFAULT_PRIMARY = "210 70% 25%";
+const DEFAULT_PRIMARY = "199 98% 19%";
 const DEFAULT_ACCENT = "120 55% 38%";
-const DEFAULT_BG = "210 15% 97%";
+const DEFAULT_BG = "199 20% 96%";
 
 export default function ConfiguracoesMarca() {
   const { t } = useTranslation();
@@ -21,7 +21,7 @@ export default function ConfiguracoesMarca() {
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [appName, setAppName] = useState(branding.app_name);
+  const [appName, setAppName] = useState(branding.app_name === "SUA LOGO AQUI" ? "" : branding.app_name);
   const [slogan, setSlogan] = useState(branding.slogan || "");
   const [companyName, setCompanyName] = useState(branding.company_name || "");
   const [cnpj, setCnpj] = useState(branding.cnpj || "");
@@ -51,7 +51,7 @@ export default function ConfiguracoesMarca() {
   const handleSave = async () => {
     setSaving(true);
     const { error } = await save({
-      app_name: appName.trim() || "SUA LOGO AQUI",
+      app_name: appName.trim() || "Minha Empresa",
       slogan: slogan.trim() || null,
       company_name: companyName.trim() || null,
       cnpj: cnpj.trim() || null,
@@ -77,7 +77,7 @@ export default function ConfiguracoesMarca() {
       toast({ title: t("common.error"), description: error.message, variant: "destructive" });
       return;
     }
-    setAppName("SUA LOGO AQUI");
+    setAppName("");
     setSlogan("");
     setCompanyName("");
     setCnpj("");
@@ -108,7 +108,7 @@ export default function ConfiguracoesMarca() {
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="app-name">{t("branding.appName")}</Label>
-            <Input id="app-name" value={appName} onChange={(e) => setAppName(e.target.value)} placeholder="SUA LOGO AQUI" />
+            <Input id="app-name" value={appName} onChange={(e) => setAppName(e.target.value)} placeholder="Ex: Minha Empresa" />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="slogan">{t("branding.slogan")}</Label>
@@ -129,7 +129,7 @@ export default function ConfiguracoesMarca() {
           <div className="space-y-1.5">
             <Label htmlFor="company-name">{t("branding.companyName")}</Label>
             <Input id="company-name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={t("branding.companyPlaceholder")} />
-            <p className="text-[11px] text-muted-foreground">{t("branding.companyHelp")}</p>
+            <p className="text-sm text-foreground/55">{t("branding.companyHelp")}</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="cnpj">{t("branding.cnpj")}</Label>
@@ -164,7 +164,10 @@ export default function ConfiguracoesMarca() {
               {logoUrl ? (
                 <img src={logoUrl} alt="logo" className="h-full w-full object-contain" />
               ) : (
-                <span className="text-[10px] text-muted-foreground text-center px-1">SUA LOGO AQUI</span>
+                <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                  <ImageOff className="h-5 w-5" />
+                  <span className="text-xs font-medium">Sem logo</span>
+                </div>
               )}
             </div>
             <div className="flex flex-col gap-2">

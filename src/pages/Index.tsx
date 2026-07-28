@@ -248,7 +248,7 @@ const Index = () => {
                     <div key={q.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/20 transition-colors">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-foreground truncate">{q.empresa_name || q.producer_name}</p>
-                        <p className="text-xs text-muted-foreground/70">{new Date(q.created_at).toLocaleDateString("pt-BR")}{q.product_name && q.product_name !== "Sem aditivo" && ` · ${q.product_name}`}</p>
+                        <p className="text-sm text-foreground/60 mt-0.5">{new Date(q.created_at).toLocaleDateString("pt-BR")}{q.product_name && q.product_name !== "Sem aditivo" && ` · ${q.product_name}`}</p>
                       </div>
                       <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ml-3", s.color)}>{s.label}</span>
                     </div>
@@ -275,8 +275,8 @@ const Index = () => {
                           <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground) / 0.6)" }} axisLine={false} tickLine={false} interval={Math.ceil(evolution.length / 5)} />
-                      <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} labelStyle={{ color: "hsl(var(--muted-foreground))" }} cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1 }} />
+                      <XAxis dataKey="label" tick={{ fontSize: 12, fontWeight: 500, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} interval={Math.ceil(evolution.length / 5)} />
+                      <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }} labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 600 }} cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1 }} />
                       <Area type="monotone" dataKey="count" stroke="hsl(var(--accent))" strokeWidth={2} fill="url(#aGrad)" dot={false} activeDot={{ r: 4, fill: "hsl(var(--accent))", strokeWidth: 0 }} isAnimationActive animationDuration={700} />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -294,7 +294,7 @@ const Index = () => {
                         <Pie data={statusMix} dataKey="value" innerRadius={36} outerRadius={58} paddingAngle={2} stroke="none" isAnimationActive animationDuration={700}>
                           {statusMix.map((s, i) => <Cell key={i} fill={s.color} />)}
                         </Pie>
-                        <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -324,7 +324,7 @@ const Index = () => {
                     <FunnelChart>
                       <Tooltip
                         formatter={(value: number) => [`${value} propostas`, ""]}
-                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 13 }}
                       />
                       <Funnel dataKey="value" data={funnelData} isAnimationActive animationDuration={700}>
                         <LabelList position="right" dataKey="name" fill="hsl(var(--muted-foreground))" stroke="none" fontSize={12} />
@@ -362,7 +362,7 @@ const Index = () => {
                   </div>
                   <div className="min-w-0 flex-1 space-y-1">
                     <p className="text-kpi-value text-2xl md:text-3xl">{metaPct}%</p>
-                    <p className="text-xs text-muted-foreground/70 leading-snug">
+                    <p className="text-sm font-medium text-foreground/65 leading-snug">
                       {brl(totalVendido)} de {brl(metaMensal)}
                     </p>
                   </div>
@@ -400,11 +400,11 @@ const Index = () => {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground leading-none">{card.title}</p>
-                      <p className="text-xs text-muted-foreground/65 mt-1">{card.subtitle}</p>
+                      <p className="text-sm text-foreground/60 mt-1">{card.subtitle}</p>
                     </div>
                   </div>
                   <p className="text-kpi-value text-3xl text-foreground"><Num v={card.value} /></p>
-                  <p className="text-xs text-muted-foreground/65 mt-2 leading-snug">{card.detail}</p>
+                  <p className="text-sm text-foreground/60 mt-2 leading-snug">{card.detail}</p>
                 </PremiumCard>
               </Link>
             ))}

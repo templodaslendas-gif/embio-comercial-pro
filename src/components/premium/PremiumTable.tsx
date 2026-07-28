@@ -47,7 +47,7 @@ export function PremiumTable<T>({
               <TableHead
                 key={col.key}
                 className={cn(
-                  "text-xs uppercase tracking-wider text-muted-foreground",
+                  "text-sm font-semibold uppercase tracking-wide text-muted-foreground",
                   col.headerClassName,
                 )}
               >

@@ -87,7 +87,7 @@
     "reset": "Restore default",
     "savedSuccess": "Brand updated!",
     "uploadError": "Error uploading logo",
-    "placeholder": "YOUR LOGO HERE"
+    "placeholder": "e.g. My Company"
   },
   "dashboard": {
     "title": "Dashboard",

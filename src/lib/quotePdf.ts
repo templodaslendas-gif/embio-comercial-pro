@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { BrandingSettings, hslToRgb, generatedByText } from "@/hooks/useBranding";
+import { BrandingSettings, hslToRgb, generatedByText, displayAppName } from "@/hooks/useBranding";
 
 interface QuoteLike {
   numero_pedido?: string | null;
@@ -49,7 +49,7 @@ export async function generateQuotePdf(quote: QuoteLike, branding: BrandingSetti
   const logoData = branding.logo_url ? await urlToDataUrl(branding.logo_url) : null;
 
   // Precompute footer rows for premium business footer
-  const companyNamePre = (branding.company_name || branding.app_name || "").trim();
+  const companyNamePre = (branding.company_name || displayAppName(branding)).trim();
   type FooterRow = { kind: "title" | "address" | "phone"; text: string };
   const footerRows: FooterRow[] = [];
   if (companyNamePre || branding.cnpj) {
@@ -101,7 +101,7 @@ export async function generateQuotePdf(quote: QuoteLike, branding: BrandingSetti
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  const headerName = (branding.company_name || branding.app_name || "").trim();
+  const headerName = (branding.company_name || displayAppName(branding)).trim();
   doc.text(headerName || "Orçamento", logoData ? 96 : 24, 44);
   if (branding.slogan) {
     doc.setFont("helvetica", "italic");

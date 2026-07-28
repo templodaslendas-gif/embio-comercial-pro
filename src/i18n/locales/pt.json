@@ -87,7 +87,7 @@
     "reset": "Restaurar padrão",
     "savedSuccess": "Marca atualizada!",
     "uploadError": "Erro ao enviar logo",
-    "placeholder": "SUA LOGO AQUI"
+    "placeholder": "Ex: Minha Empresa"
   },
   "dashboard": {
     "title": "Dashboard",

@@ -17,8 +17,10 @@ export interface BrandingSettings {
   meta_mensal: number | null;
 }
 
+const PLATFORM_NAME = "Embio Intelligence Pro";
+
 const DEFAULTS: BrandingSettings = {
-  app_name: "SUA LOGO AQUI",
+  app_name: PLATFORM_NAME,
   slogan: null,
   company_name: null,
   logo_url: null,
@@ -97,6 +99,13 @@ export function hslToRgb(hsl: string): [number, number, number] {
 export function generatedByText(b: BrandingSettings): string {
   const name = (b.company_name || b.app_name || "").trim();
   return name ? `Gerado por ${name}` : "Gerado";
+}
+
+const LEGACY_PLACEHOLDERS = ["SUA LOGO AQUI", ""];
+
+export function displayAppName(b: BrandingSettings): string {
+  const name = (b.app_name || "").trim();
+  return LEGACY_PLACEHOLDERS.includes(name) ? PLATFORM_NAME : name;
 }
 
 function applyCssVars(b: BrandingSettings) {

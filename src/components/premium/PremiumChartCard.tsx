@@ -18,7 +18,7 @@ export function PremiumChartCard({ title, subtitle, icon: Icon, children, classN
         <div>
           <p className="text-sm font-semibold text-foreground">{title}</p>
           {subtitle && (
-            <p className="text-xs text-muted-foreground/60 mt-0.5">{subtitle}</p>
+            <p className="text-sm text-foreground/60 mt-0.5">{subtitle}</p>
           )}
         </div>
         {Icon && <Icon className="h-4 w-4 text-muted-foreground/35 mt-0.5" />}

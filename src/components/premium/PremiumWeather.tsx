@@ -122,20 +122,20 @@ export function PremiumWeather({ className, showSummary }: { className?: string;
       <div className={cn("absolute inset-0 bg-gradient-to-br pointer-events-none", gradient)} />
       <div className="relative p-3 space-y-1.5">
         {(permission === "prompt" || permission === "unknown") ? (
-          <div className="flex items-center justify-between gap-2 rounded-lg bg-accent/8 border border-accent/15 px-3 py-1.5">
+          <div className="flex items-center justify-between gap-2 rounded-lg bg-accent/8 border border-accent/15 px-3 py-2">
             <div className="flex items-center gap-2 min-w-0">
-              <MapPin className="h-3 w-3 text-accent shrink-0" />
-              <span className="text-xs text-muted-foreground truncate">Usar minha localização?</span>
+              <MapPin className="h-3.5 w-3.5 text-accent shrink-0" />
+              <span className="text-sm font-medium text-foreground/80 truncate">Usar minha localização?</span>
             </div>
-            <Button size="sm" className="h-6 px-2.5 text-xs shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground"
+            <Button size="sm" className="h-7 px-3 text-sm font-medium shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground"
               onClick={requestLocation} disabled={requesting}>
               {requesting ? "..." : "Permitir"}
             </Button>
           </div>
         ) : permission === "denied" ? (
-          <div className="flex items-center gap-2 rounded-lg bg-muted/30 border border-border/30 px-3 py-1.5">
-            <AlertCircle className="h-3 w-3 text-muted-foreground shrink-0" />
-            <span className="text-[11px] text-muted-foreground flex-1">Usando localização padrão.</span>
+          <div className="flex items-center gap-2 rounded-lg bg-muted/30 border border-border/30 px-3 py-2">
+            <AlertCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <span className="text-sm text-foreground/70 flex-1">Usando localização padrão.</span>
           </div>
         ) : null}
 
@@ -183,12 +183,12 @@ function WeatherContent({
         "flex flex-col items-center gap-0.5 rounded-lg py-1.5 px-0.5 transition-colors",
         isToday ? "bg-accent/15 ring-1 ring-accent/20" : "bg-muted/20 hover:bg-muted/35",
       )}>
-        <span className={cn("text-[10px] font-bold leading-none", isToday ? "text-accent" : "text-muted-foreground/65")}>
+        <span className={cn("text-xs font-bold leading-none", isToday ? "text-accent" : "text-foreground/60")}>
           {dayLabel}
         </span>
         <Icon className={cn("h-4 w-4 mt-0.5", isToday ? "text-accent" : "text-muted-foreground/60")} />
-        <span className="text-[11px] tabular-nums font-bold text-foreground leading-tight">{max}°</span>
-        <span className="text-[9px] tabular-nums text-muted-foreground/55 leading-tight">{min}°</span>
+        <span className="text-sm tabular-nums font-bold text-foreground leading-tight">{max}°</span>
+        <span className="text-xs tabular-nums font-medium text-foreground/55 leading-tight">{min}°</span>
       </div>
     );
   };
@@ -205,7 +205,7 @@ function WeatherContent({
               <span className="text-5xl font-bold tabular-nums text-foreground">{temp}</span>
               <span className="text-xl font-light text-muted-foreground mt-1">°C</span>
             </div>
-            <p className="text-[11px] text-muted-foreground/75 mt-0.5">{desc}</p>
+            <p className="text-sm font-medium text-foreground/70 mt-0.5">{desc}</p>
           </div>
         </div>
 
@@ -213,20 +213,20 @@ function WeatherContent({
 
         {/* Localização + stats */}
         <div className="shrink-0">
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground/60 mb-1.5">
-            <MapPin className="h-3 w-3 shrink-0" />
+          <div className="flex items-center gap-1 text-sm text-foreground/65 mb-1.5">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate max-w-[120px]">{coords.name}</span>
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+          <div className="flex items-center gap-3 text-sm text-foreground/75 flex-wrap">
             <div className="flex items-center gap-1">
-              <Droplets className="h-3 w-3 text-blue-400 shrink-0" />
+              <Droplets className="h-3.5 w-3.5 text-blue-400 shrink-0" />
               <span className="tabular-nums font-medium">{humidity}%</span>
             </div>
             <div className="flex items-center gap-1">
-              <Wind className="h-3 w-3 shrink-0" />
+              <Wind className="h-3.5 w-3.5 shrink-0" />
               <span className="tabular-nums font-medium">{wind} km/h</span>
             </div>
-            <span className="tabular-nums text-foreground/70 font-semibold">{todayMax}°/{todayMin}°</span>
+            <span className="tabular-nums text-foreground/80 font-semibold">{todayMax}°/{todayMin}°</span>
           </div>
         </div>
 
@@ -288,7 +288,7 @@ function WeatherSummaryInline({ data }: { data: Record<string, any> }) {
 
   return (
     <div className="border-t border-border/25 pt-1.5">
-      <p className="text-[11px] text-muted-foreground/70 leading-snug">{text}</p>
+      <p className="text-sm font-medium text-foreground/70 leading-snug">{text}</p>
     </div>
   );
 }

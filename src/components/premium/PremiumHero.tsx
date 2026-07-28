@@ -32,13 +32,13 @@ export function PremiumHero({
         <div className="space-y-1.5">
           {badge && <div>{badge}</div>}
           {eyebrow && (
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground/40 font-medium capitalize">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold capitalize">
               {eyebrow}
             </p>
           )}
           <h1 className="text-xl font-bold text-foreground tracking-tight">{title}</h1>
           {subtitle && (
-            <p className="text-xs text-muted-foreground/55 mt-0.5">{subtitle}</p>
+            <p className="text-sm text-foreground/65 mt-0.5">{subtitle}</p>
           )}
         </div>
         {(action || meta) && (

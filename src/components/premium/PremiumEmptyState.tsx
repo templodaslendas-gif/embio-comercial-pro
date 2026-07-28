@@ -24,12 +24,12 @@ export function PremiumEmptyState({
       className,
     )}>
       <div className="h-11 w-11 rounded-xl bg-muted/40 flex items-center justify-center">
-        <Icon className="h-5 w-5 text-muted-foreground/35" />
+        <Icon className="h-5 w-5 text-muted-foreground/50" />
       </div>
       <div>
-        <p className="text-sm font-medium text-foreground/65">{title}</p>
+        <p className="text-sm font-semibold text-foreground/75">{title}</p>
         {description && (
-          <p className="text-xs text-muted-foreground/50 mt-0.5 max-w-[220px] leading-snug">{description}</p>
+          <p className="text-sm text-foreground/55 mt-1 max-w-[240px] leading-snug">{description}</p>
         )}
       </div>
       {action}

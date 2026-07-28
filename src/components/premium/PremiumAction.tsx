@@ -28,7 +28,7 @@ export function PremiumAction({ icon: Icon, label, description, to, className }:
         </div>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-foreground leading-none">{label}</p>
-          <p className="text-xs text-muted-foreground/65 mt-1.5 leading-none truncate">{description}</p>
+          <p className="text-sm text-foreground/60 mt-1.5 leading-none truncate">{description}</p>
         </div>
       </Link>
     </motion.div>
