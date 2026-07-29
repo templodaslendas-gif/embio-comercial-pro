@@ -535,6 +535,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      registrar_entrada_orcamento: {
+        Args: { p_data_vencimento?: string; p_orcamento_id: string }
+        Returns: {
+          categoria: string | null
+          cliente_id: string | null
+          created_at: string
+          data_pagamento: string | null
+          data_vencimento: string | null
+          descricao: string
+          forma_pagamento: string | null
+          id: string
+          observacoes: string | null
+          orcamento_id: string | null
+          status: string
+          tipo: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "financeiro_movimentacoes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       seed_catalogo_base: { Args: { p_user_id: string }; Returns: undefined }
     }
     Enums: {

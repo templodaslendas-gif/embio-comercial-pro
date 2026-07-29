@@ -110,27 +110,14 @@ export async function ensureEntradaFromOrcamento(orc: {
   numero_orcamento: string | null;
   total: number | string;
 }): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  const { data: existing } = await db()
-    .select("id")
-    .eq("orcamento_id", orc.id)
-    .neq("status", "cancelado")
-    .limit(1);
-  if (existing && existing.length > 0) return;
-  const valor = safeMoney(orc.total);
-  const descricao = [orc.numero_orcamento, orc.cliente_nome].filter(Boolean).join(" — ") || "Proposta aprovada";
-  await db().insert({
-    user_id: user.id,
-    tipo: "entrada",
-    descricao,
-    categoria: "Propostas",
-    valor,
-    status: "pendente",
-    orcamento_id: orc.id,
-    cliente_id: orc.cliente_id,
-    data_vencimento: new Date().toISOString().slice(0, 10),
+  // Criação atômica via RPC: o banco garante (índice UNIQUE parcial)
+  // que só existe uma entrada "entrada" ativa por orçamento, mesmo sob
+  // chamadas concorrentes ou repetidas — não depende mais de um
+  // check-then-insert no frontend.
+  const { error } = await supabase.rpc("registrar_entrada_orcamento", {
+    p_orcamento_id: orc.id,
   });
+  if (error) throw error;
 }
 
 export async function cancelarEntradaByOrcamento(orcamentoId: string): Promise<void> {
