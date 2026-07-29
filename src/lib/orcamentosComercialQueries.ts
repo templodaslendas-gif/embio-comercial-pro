@@ -59,7 +59,7 @@ export type FinanceiroMetrics = {
 };
 
 export async function fetchOrcamentos(): Promise<OrcamentoComercial[]> {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('orcamentos')
     .select('*')
     .order('created_at', { ascending: false });
@@ -68,7 +68,7 @@ export async function fetchOrcamentos(): Promise<OrcamentoComercial[]> {
 }
 
 export async function fetchOrcamentoById(id: string): Promise<OrcamentoComercial & { itens: OrcamentoItem[] }> {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('orcamentos')
     .select('*, orcamento_itens(*)')
     .eq('id', id)
@@ -84,7 +84,7 @@ export async function createOrcamento(
 ): Promise<OrcamentoComercial> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Usuário não autenticado');
-  const { data: orc, error: orcErr } = await (supabase as any)
+  const { data: orc, error: orcErr } = await supabase
     .from('orcamentos')
     .insert({ ...draft, user_id: user.id })
     .select()
@@ -92,10 +92,10 @@ export async function createOrcamento(
   if (orcErr) throw orcErr;
   if (itens.length > 0) {
     const rows = itens.map((item, i) => ({ ...item, orcamento_id: orc.id, ordem: item.ordem ?? i }));
-    const { error: iErr } = await (supabase as any).from('orcamento_itens').insert(rows);
+    const { error: iErr } = await supabase.from('orcamento_itens').insert(rows);
     if (iErr) throw iErr;
   }
-  const { data: fresh, error: fErr } = await (supabase as any)
+  const { data: fresh, error: fErr } = await supabase
     .from('orcamentos').select('*').eq('id', orc.id).single();
   if (fErr) throw fErr;
   return fresh;
@@ -106,23 +106,23 @@ export async function updateOrcamento(
   draft: OrcamentoDraft,
   itens: OrcamentoItemDraft[],
 ): Promise<void> {
-  const { error: oErr } = await (supabase as any)
+  const { error: oErr } = await supabase
     .from('orcamentos')
     .update({ ...draft, updated_at: new Date().toISOString() })
     .eq('id', id);
   if (oErr) throw oErr;
-  const { error: dErr } = await (supabase as any)
+  const { error: dErr } = await supabase
     .from('orcamento_itens').delete().eq('orcamento_id', id);
   if (dErr) throw dErr;
   if (itens.length > 0) {
     const rows = itens.map((item, i) => ({ ...item, orcamento_id: id, ordem: item.ordem ?? i }));
-    const { error: iErr } = await (supabase as any).from('orcamento_itens').insert(rows);
+    const { error: iErr } = await supabase.from('orcamento_itens').insert(rows);
     if (iErr) throw iErr;
   }
 }
 
 export async function updateOrcamentoStatus(id: string, status: OrcamentoStatus): Promise<void> {
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('orcamentos')
     .update({ status, updated_at: new Date().toISOString() })
     .eq('id', id);
@@ -130,7 +130,7 @@ export async function updateOrcamentoStatus(id: string, status: OrcamentoStatus)
 }
 
 export async function deleteOrcamento(id: string): Promise<void> {
-  const { error } = await (supabase as any).from('orcamentos').delete().eq('id', id);
+  const { error } = await supabase.from('orcamentos').delete().eq('id', id);
   if (error) throw error;
 }
 
@@ -156,7 +156,7 @@ export async function duplicateOrcamento(id: string): Promise<OrcamentoComercial
 }
 
 export async function fetchFinanceiroMetrics(): Promise<FinanceiroMetrics> {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('orcamentos').select('status, total');
   if (error) throw error;
   const all: { status: string; total: number }[] = data || [];

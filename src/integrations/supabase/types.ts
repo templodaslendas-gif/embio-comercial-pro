@@ -10,10 +10,67 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
+      branding_settings: {
+        Row: {
+          accent_color: string | null
+          address: string | null
+          app_name: string
+          background_color: string | null
+          cnpj: string | null
+          company_name: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          meta_mensal: number | null
+          phone: string | null
+          phone_is_whatsapp: boolean
+          primary_color: string | null
+          slogan: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accent_color?: string | null
+          address?: string | null
+          app_name?: string
+          background_color?: string | null
+          cnpj?: string | null
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          meta_mensal?: number | null
+          phone?: string | null
+          phone_is_whatsapp?: boolean
+          primary_color?: string | null
+          slogan?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accent_color?: string | null
+          address?: string | null
+          app_name?: string
+          background_color?: string | null
+          cnpj?: string | null
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          meta_mensal?: number | null
+          phone?: string | null
+          phone_is_whatsapp?: boolean
+          primary_color?: string | null
+          slogan?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       catalogo_itens: {
         Row: {
           ativo: boolean
@@ -59,55 +116,40 @@ export type Database = {
         }
         Relationships: []
       }
-      branding_settings: {
+      clientes: {
         Row: {
-          accent_color: string | null
-          address: string | null
-          app_name: string
-          background_color: string | null
-          cnpj: string | null
-          company_name: string | null
+          cidade: string | null
           created_at: string
+          endereco: string | null
           id: string
-          logo_url: string | null
-          phone: string | null
-          phone_is_whatsapp: boolean
-          primary_color: string | null
-          slogan: string | null
+          nome: string
+          observacoes: string | null
+          status: string
+          telefone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          accent_color?: string | null
-          address?: string | null
-          app_name?: string
-          background_color?: string | null
-          cnpj?: string | null
-          company_name?: string | null
+          cidade?: string | null
           created_at?: string
+          endereco?: string | null
           id?: string
-          logo_url?: string | null
-          phone?: string | null
-          phone_is_whatsapp?: boolean
-          primary_color?: string | null
-          slogan?: string | null
+          nome: string
+          observacoes?: string | null
+          status?: string
+          telefone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          accent_color?: string | null
-          address?: string | null
-          app_name?: string
-          background_color?: string | null
-          cnpj?: string | null
-          company_name?: string | null
+          cidade?: string | null
           created_at?: string
+          endereco?: string | null
           id?: string
-          logo_url?: string | null
-          phone?: string | null
-          phone_is_whatsapp?: boolean
-          primary_color?: string | null
-          slogan?: string | null
+          nome?: string
+          observacoes?: string | null
+          status?: string
+          telefone?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -145,6 +187,185 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      financeiro_movimentacoes: {
+        Row: {
+          categoria: string | null
+          cliente_id: string | null
+          created_at: string
+          data_pagamento: string | null
+          data_vencimento: string | null
+          descricao: string
+          forma_pagamento: string | null
+          id: string
+          observacoes: string | null
+          orcamento_id: string | null
+          status: string
+          tipo: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          categoria?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          descricao: string
+          forma_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          orcamento_id?: string | null
+          status?: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+          valor?: number
+        }
+        Update: {
+          categoria?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          descricao?: string
+          forma_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          orcamento_id?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financeiro_movimentacoes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financeiro_movimentacoes_orcamento_id_fkey"
+            columns: ["orcamento_id"]
+            isOneToOne: false
+            referencedRelation: "orcamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orcamento_itens: {
+        Row: {
+          catalogo_item_id: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          nome_item: string
+          orcamento_id: string
+          ordem: number
+          quantidade: number
+          subtotal: number | null
+          unidade: string | null
+          valor_unitario: number
+        }
+        Insert: {
+          catalogo_item_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome_item: string
+          orcamento_id: string
+          ordem?: number
+          quantidade?: number
+          subtotal?: number | null
+          unidade?: string | null
+          valor_unitario?: number
+        }
+        Update: {
+          catalogo_item_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome_item?: string
+          orcamento_id?: string
+          ordem?: number
+          quantidade?: number
+          subtotal?: number | null
+          unidade?: string | null
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orcamento_itens_catalogo_item_id_fkey"
+            columns: ["catalogo_item_id"]
+            isOneToOne: false
+            referencedRelation: "catalogo_itens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orcamento_itens_orcamento_id_fkey"
+            columns: ["orcamento_id"]
+            isOneToOne: false
+            referencedRelation: "orcamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orcamentos: {
+        Row: {
+          cliente_id: string | null
+          cliente_nome: string | null
+          created_at: string
+          forma_pagamento: string | null
+          id: string
+          numero_orcamento: string | null
+          observacoes: string | null
+          status: string
+          total: number
+          updated_at: string
+          user_id: string
+          validade_dias: number
+        }
+        Insert: {
+          cliente_id?: string | null
+          cliente_nome?: string | null
+          created_at?: string
+          forma_pagamento?: string | null
+          id?: string
+          numero_orcamento?: string | null
+          observacoes?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id: string
+          validade_dias?: number
+        }
+        Update: {
+          cliente_id?: string | null
+          cliente_nome?: string | null
+          created_at?: string
+          forma_pagamento?: string | null
+          id?: string
+          numero_orcamento?: string | null
+          observacoes?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+          validade_dias?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orcamentos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -256,12 +477,65 @@ export type Database = {
           },
         ]
       }
+      servicos: {
+        Row: {
+          cidade: string | null
+          cliente_id: string | null
+          created_at: string
+          data: string
+          hora: string | null
+          id: string
+          observacoes: string | null
+          status: string
+          tipo: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cidade?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          data: string
+          hora?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: string
+          tipo?: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cidade?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          data?: string
+          hora?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "servicos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      seed_catalogo_base: { Args: { p_user_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

@@ -50,7 +50,7 @@ export interface FinanceiroRealMetrics {
   pendentesMes: number;
 }
 
-const db = () => (supabase as any).from("financeiro_movimentacoes");
+const db = () => supabase.from("financeiro_movimentacoes");
 
 export async function fetchMovimentacoes(): Promise<FinanceiroMovimentacao[]> {
   const { data, error } = await db()

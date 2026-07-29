@@ -28,7 +28,7 @@ export type ServicoInsert = {
 };
 
 export async function fetchServicos(): Promise<Servico[]> {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("servicos")
     .select("*, clientes(nome)")
     .order("data", { ascending: true })
@@ -40,7 +40,7 @@ export async function fetchServicos(): Promise<Servico[]> {
 export async function createServico(s: ServicoInsert): Promise<Servico> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Usuário não autenticado");
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("servicos")
     .insert({ ...s, user_id: user.id })
     .select("*, clientes(nome)")
@@ -50,7 +50,7 @@ export async function createServico(s: ServicoInsert): Promise<Servico> {
 }
 
 export async function updateServico(id: string, s: Partial<ServicoInsert>): Promise<Servico> {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("servicos")
     .update(s)
     .eq("id", id)
@@ -61,6 +61,6 @@ export async function updateServico(id: string, s: Partial<ServicoInsert>): Prom
 }
 
 export async function deleteServico(id: string): Promise<void> {
-  const { error } = await (supabase as any).from("servicos").delete().eq("id", id);
+  const { error } = await supabase.from("servicos").delete().eq("id", id);
   if (error) throw error;
 }
