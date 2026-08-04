@@ -2,14 +2,14 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   ShieldCheck, Users, UserX, UserCheck2, Receipt, Clock, CheckCircle2,
-  XCircle, FolderCheck, Wallet, TrendingUp, Target, GitBranch, Trophy, AlertTriangle,
+  FolderCheck, Wallet, TrendingUp, Target, GitBranch, Trophy, AlertTriangle,
 } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell,
 } from "recharts";
-import { fetchOrcamentos, type OrcamentoComercial } from "@/lib/orcamentosComercialQueries";
+import { fetchOrcamentos } from "@/lib/orcamentosComercialQueries";
 import { fetchVendedoresOverview } from "@/lib/adminQueries";
-import { safeMoney } from "@/lib/utils";
+import { buildMonthlyChartData, buildFunilData, buildParadasBuckets, computePropostaStats } from "@/lib/adminMetrics";
 import {
   PremiumPage, PremiumSection, PremiumHeader, PremiumChartCard, PremiumStat,
   PremiumEmptyState,
@@ -46,69 +46,10 @@ export default function AdminDashboard() {
     [vendedores],
   );
 
-  const propostaStats = useMemo(() => {
-    const counts = { em_aberto: 0, aprovado: 0, recusado: 0, finalizado: 0 };
-    orcamentos.forEach((o) => { counts[o.status] = (counts[o.status] ?? 0) + 1; });
-    const total = orcamentos.length;
-    const valorOrcado = orcamentos.reduce((s, o) => s + safeMoney(o.total), 0);
-    const valorVendido = orcamentos
-      .filter((o) => o.status === "aprovado" || o.status === "finalizado")
-      .reduce((s, o) => s + safeMoney(o.total), 0);
-    return {
-      total,
-      ...counts,
-      valorOrcado,
-      valorVendido,
-      ticketMedio: total > 0 ? valorOrcado / total : 0,
-      conversao: total > 0 ? ((counts.aprovado + counts.finalizado) / total) * 100 : 0,
-    };
-  }, [orcamentos]);
-
-  const last6Months = useMemo(() => {
-    const now = new Date();
-    return Array.from({ length: 6 }, (_, i) => {
-      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
-      return { key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }) };
-    });
-  }, []);
-
-  const porMes = useMemo(() => {
-    const buckets = new Map(last6Months.map((m) => [m.key, { label: m.label, propostas: 0, valorVendido: 0 }]));
-    orcamentos.forEach((o: OrcamentoComercial) => {
-      const d = new Date(o.created_at);
-      const key = `${d.getFullYear()}-${d.getMonth()}`;
-      const bucket = buckets.get(key);
-      if (!bucket) return;
-      bucket.propostas += 1;
-      if (o.status === "aprovado" || o.status === "finalizado") bucket.valorVendido += safeMoney(o.total);
-    });
-    return Array.from(buckets.values());
-  }, [orcamentos, last6Months]);
-
-  const funilData = useMemo(() => ([
-    { name: "Em aberto", value: propostaStats.em_aberto, fill: "hsl(38, 92%, 50%)" },
-    { name: "Aprovado", value: propostaStats.aprovado, fill: "hsl(120, 55%, 40%)" },
-    { name: "Recusado", value: propostaStats.recusado, fill: "hsl(0, 65%, 52%)" },
-    { name: "Finalizado", value: propostaStats.finalizado, fill: "hsl(199, 20%, 55%)" },
-  ]), [propostaStats]);
-
-  // "Parada" considera só propostas em_aberto — só faz sentido medir tempo
-  // parado para o que ainda está pendente de decisão. Usa updated_at (cai
-  // para created_at se nunca foi atualizada, a melhor data real disponível).
-  const propostasParadas = useMemo(() => {
-    const now = Date.now();
-    const buckets = { "7–14 dias": 0, "15–29 dias": 0, "30+ dias": 0 };
-    orcamentos
-      .filter((o) => o.status === "em_aberto")
-      .forEach((o) => {
-        const ref = o.updated_at || o.created_at;
-        const days = Math.floor((now - new Date(ref).getTime()) / 86_400_000);
-        if (days >= 30) buckets["30+ dias"] += 1;
-        else if (days >= 15) buckets["15–29 dias"] += 1;
-        else if (days >= 7) buckets["7–14 dias"] += 1;
-      });
-    return Object.entries(buckets).map(([label, value]) => ({ label, value }));
-  }, [orcamentos]);
+  const propostaStats = useMemo(() => computePropostaStats(orcamentos), [orcamentos]);
+  const porMes = useMemo(() => buildMonthlyChartData(orcamentos, 6), [orcamentos]);
+  const funilData = useMemo(() => buildFunilData(orcamentos), [orcamentos]);
+  const propostasParadas = useMemo(() => buildParadasBuckets(orcamentos), [orcamentos]);
 
   const ranking = useMemo(
     () => [...vendedores].sort((a, b) => b.valor_vendido - a.valor_vendido).slice(0, 6),
