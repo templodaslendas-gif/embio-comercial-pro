@@ -222,3 +222,26 @@ commercial/orcamentos/queries.ts  ← fetchOrcamentos, createOrcamento, converte
 
 ### Alternativas Consideradas
 - **Manter `queries.ts` único em `src/lib/ff/`**: mais rápido de copiar, mas cria um "god file" de queries sem dono claro
+
+---
+
+## [DEC-009] Role de Autorização em Tabela `user_roles` Separada
+**Data**: 2026-08-04
+**Status**: Aprovada
+**Responsável**: Lead
+
+### Contexto
+Missão 04A precisa de uma fonte oficial de role (`super_admin` / `vendedor`) que o próprio usuário não consiga alterar, compatível com RLS e auditável. As alternativas eram `profiles.role`, uma tabela `user_roles` separada, ou custom claims via Auth Hook.
+
+### Decisão
+Criar `public.user_roles(user_id, role)` com `UNIQUE(user_id, role)`, sem nenhuma policy de `INSERT`/`UPDATE`/`DELETE` para `authenticated` — apenas `service_role` escreve. Uma função `public.is_super_admin()` (`SECURITY DEFINER`, `search_path = ''`) é usada nas policies de RLS das tabelas comerciais. Não foi criado Auth Hook de custom claims nesta missão.
+
+### Consequências
+- Um vendedor não consegue se autopromover mesmo tendo UPDATE total na própria linha de `profiles`, porque a role nunca esteve em `profiles`.
+- Toda promoção/demoção passa obrigatoriamente pelo Supabase Dashboard/SQL Editor (ação manual e auditável) até que exista um fluxo de convite administrativo.
+- Preparado para expansão multiempresa futura: `user_roles` já suporta múltiplas roles por usuário via `UNIQUE(user_id, role)`.
+- Sem Auth Hook, o frontend consulta `user_roles` diretamente (protegido por RLS) em vez de decodificar um claim do JWT — uma query extra no login, mas sem risco de claim desatualizado após uma mudança de role.
+
+### Alternativas Consideradas
+- **`profiles.role`**: mesma tabela que o usuário já teria permissão de `UPDATE` em outras colunas — exigiria proteção coluna-a-coluna (trigger `BEFORE UPDATE` bloqueando mudança de `role`), mais frágil que simplesmente não conceder a policy de escrita.
+- **Custom claims via Auth Hook**: mais performático (role já vem no JWT), mas exige configuração manual no Supabase Dashboard (Authentication > Hooks) e sofre de claim desatualizado até o próximo refresh de token após uma mudança de role. Fica registrado como possível evolução futura.
