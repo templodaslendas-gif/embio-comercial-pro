@@ -369,23 +369,38 @@ export type Database = {
       }
       profiles: {
         Row: {
+          cidade: string | null
           created_at: string
+          estado: string | null
+          foto_url: string | null
           full_name: string | null
           id: string
+          status: string
+          telefone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          cidade?: string | null
           created_at?: string
+          estado?: string | null
+          foto_url?: string | null
           full_name?: string | null
           id?: string
+          status?: string
+          telefone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          cidade?: string | null
           created_at?: string
+          estado?: string | null
+          foto_url?: string | null
           full_name?: string | null
           id?: string
+          status?: string
+          telefone?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -583,6 +598,28 @@ export type Database = {
         }
       }
       seed_catalogo_base: { Args: { p_user_id: string }; Returns: undefined }
+      admin_vendedores_overview: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          full_name: string | null
+          email: string | null
+          telefone: string | null
+          cidade: string | null
+          estado: string | null
+          foto_url: string | null
+          status: string
+          role: Database["public"]["Enums"]["app_role"] | null
+          created_at: string
+          clientes_count: number
+          propostas_count: number
+          propostas_aprovadas: number
+          propostas_recusadas: number
+          propostas_finalizadas: number
+          valor_orcado: number
+          valor_vendido: number
+        }[]
+      }
     }
     Enums: {
       app_role: "vendedor" | "super_admin"
