@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 export type AppRole = "vendedor" | "super_admin";
 
@@ -50,17 +51,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     setRoleLoading(true);
 
-    supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "super_admin")
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled) return;
-        setRole(data ? "super_admin" : "vendedor");
-        setRoleLoading(false);
-      });
+    Promise.all([
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "super_admin")
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("status")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]).then(([roleRes, profileRes]) => {
+      if (cancelled) return;
+
+      // Sem profile ainda (não deveria acontecer, handle_new_user cria um
+      // em todo signup) é tratado como ativo — mesma postura "não bloquear
+      // usuários atuais" adotada no resto do projeto.
+      const status = profileRes.data?.status ?? "ativo";
+      if (status !== "ativo") {
+        toast.error(
+          status === "bloqueado"
+            ? "Seu acesso foi bloqueado pelo administrador."
+            : "Sua conta foi desligada. Acesso encerrado.",
+        );
+        // signOut() dispara onAuthStateChange, que zera user/session — as
+        // rotas protegidas já redirecionam sozinhas para /auth quando não
+        // há usuário, sem precisar de lógica de navegação aqui.
+        supabase.auth.signOut();
+        return;
+      }
+
+      setRole(roleRes.data ? "super_admin" : "vendedor");
+      setRoleLoading(false);
+    });
 
     return () => {
       cancelled = true;
