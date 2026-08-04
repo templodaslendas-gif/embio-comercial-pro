@@ -2,10 +2,14 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
+export type AppRole = "vendedor" | "super_admin";
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  role: AppRole | null;
+  roleLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -17,6 +21,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState<AppRole | null>(null);
+  const [roleLoading, setRoleLoading] = useState(true);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -33,6 +39,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setRole(null);
+      setRoleLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setRoleLoading(true);
+
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "super_admin")
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setRole(data ? "super_admin" : "vendedor");
+        setRoleLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -56,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, role, roleLoading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
