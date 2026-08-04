@@ -1,4 +1,4 @@
-import { LayoutDashboard, LogOut, ArrowLeftCircle } from "lucide-react";
+import { LayoutDashboard, LogOut, ArrowLeftCircle, Users } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -42,6 +42,14 @@ export function AdminSidebar() {
                   <NavLink to="/admin" end className={nav} activeClassName={navActive}>
                     <LayoutDashboard className="h-[15px] w-[15px] shrink-0 opacity-85" />
                     <span>Dashboard</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/admin/vendedores" className={nav} activeClassName={navActive}>
+                    <Users className="h-[15px] w-[15px] shrink-0 opacity-85" />
+                    <span>Vendedores</span>
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
