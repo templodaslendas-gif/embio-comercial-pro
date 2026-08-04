@@ -245,3 +245,29 @@ Criar `public.user_roles(user_id, role)` com `UNIQUE(user_id, role)`, sem nenhum
 ### Alternativas Consideradas
 - **`profiles.role`**: mesma tabela que o usuário já teria permissão de `UPDATE` em outras colunas — exigiria proteção coluna-a-coluna (trigger `BEFORE UPDATE` bloqueando mudança de `role`), mais frágil que simplesmente não conceder a policy de escrita.
 - **Custom claims via Auth Hook**: mais performático (role já vem no JWT), mas exige configuração manual no Supabase Dashboard (Authentication > Hooks) e sofre de claim desatualizado até o próximo refresh de token após uma mudança de role. Fica registrado como possível evolução futura.
+
+---
+
+## [DEC-010] Bloqueio de Vendedor em Três Camadas: Edge Function + `profiles.status` + RLS
+**Data**: 2026-08-04
+**Status**: Aprovada
+**Responsável**: Lead
+
+### Contexto
+Missão 04B precisa que o Super Admin consiga bloquear/desbloquear/desligar/reativar vendedores de forma real (impedindo login), não só uma bandeira decorativa. `auth.admin.updateUserById` (a única forma de banir uma conta de verdade no Supabase Auth) exige a `service_role` key, que nunca pode chegar ao navegador. O ambiente onde este código foi escrito não tinha Supabase CLI/Deno/Docker instalados, então a Edge Function não pôde ser testada nem implantada nesta sessão.
+
+### Decisão
+Três camadas, cada uma cobrindo a lacuna da anterior:
+1. **Edge Function `admin-user-actions`** (`supabase/functions/admin-user-actions/`) — roda com `service_role` só no servidor, valida o JWT do chamador e confirma `super_admin` via `user_roles` antes de qualquer ação. Bane/desbane de verdade via `auth.admin.updateUserById` (`ban_duration`), e sincroniza `profiles.status` na mesma chamada.
+2. **`profiles.status`** (`'ativo' | 'bloqueado' | 'desligado'`, `DEFAULT 'ativo'`) — lido pelo `useAuth` a cada sessão; se não for `'ativo'`, força `signOut()` imediato no frontend. Protegido contra autoedição por um trigger `BEFORE UPDATE` que só aceita mudança de `status` vinda de `super_admin` ou da própria Edge Function (via `auth.role() = 'service_role'`).
+3. **`is_active_user()` nas policies de dono** das 6 tabelas comerciais (`clientes`, `catalogo_itens`, `servicos`, `orcamentos`, `orcamento_itens`, `financeiro_movimentacoes`) — fecha a lacuna de um JWT já emitido e ainda válido (o Auth do Supabase não invalida tokens em emissão retroativa): mesmo com token capturado, leitura/escrita direta na API para quando `status != 'ativo'`. Não afeta as policies de leitura administrativa do Super Admin — histórico de um vendedor bloqueado continua visível para ele.
+
+### Consequências
+- Bloqueio funciona mesmo sem a Edge Function implantada (camadas 2 e 3 já cortam o acesso), mas só a Edge Function impede login em si — até o deploy, uma sessão já aberta com token ainda válido só é cortada quando o app roda de novo (camada 2) ou quando chama a API diretamente (camada 3), nunca por revogação do próprio Auth.
+- `profiles.status` nunca é a fonte de verdade de "a pessoa consegue logar" — é sincronia e UX. A fonte de verdade de acesso real é `auth.users.banned_until`, controlada só pela Edge Function.
+- Custo de manutenção: três lugares para manter coerentes em vez de um. Aceito porque nenhuma camada sozinha resolve tudo com as ferramentas disponíveis nesta missão.
+- Rate limiting da Edge Function é em memória, por instância — reseta a cada cold start, não é distribuído. Documentado como limitação, não um rate limit robusto.
+
+### Alternativas Consideradas
+- **Só `profiles.status` + RLS, sem Edge Function**: mais simples, mas não impede login de verdade — a pessoa continua autenticando no Supabase Auth, só perde acesso *dentro* do app. Rejeitada porque o pedido explícito da missão foi bloqueio real via `auth.admin.updateUserById`.
+- **Só Edge Function, sem `profiles.status`**: mais simples de manter, mas sem a Edge Function implantada (não há deploy nesta sessão) o bloqueio não teria efeito nenhum até o usuário rodar `supabase functions deploy` por conta própria. `profiles.status` garante alguma proteção desde o primeiro commit, sem depender de uma etapa manual externa.
