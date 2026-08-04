@@ -12,6 +12,8 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RoleBasedHome } from "@/components/RoleBasedHome";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminVendedores from "./pages/admin/AdminVendedores";
+import AdminVendedorDetail from "./pages/admin/AdminVendedorDetail";
 import NovoOrcamento from "./pages/NovoOrcamento";
 import MeusClientes from "./pages/MeusClientes";
 import InstrucoesPreparo from "./pages/InstrucoesPreparo";
@@ -47,11 +49,15 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route
-                path="/admin"
+                path="/admin/*"
                 element={
                   <AdminRoute>
                     <AdminLayout>
-                      <AdminDashboard />
+                      <Routes>
+                        <Route path="/" element={<AdminDashboard />} />
+                        <Route path="/vendedores" element={<AdminVendedores />} />
+                        <Route path="/vendedores/:id" element={<AdminVendedorDetail />} />
+                      </Routes>
                     </AdminLayout>
                   </AdminRoute>
                 }
