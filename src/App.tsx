@@ -6,9 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { BrandingProvider } from "@/hooks/useBranding";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import { Layout } from "@/components/Layout";
-import Index from "./pages/Index";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { RoleBasedHome } from "@/components/RoleBasedHome";
 import Auth from "./pages/Auth";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import NovoOrcamento from "./pages/NovoOrcamento";
 import MeusClientes from "./pages/MeusClientes";
 import InstrucoesPreparo from "./pages/InstrucoesPreparo";
@@ -44,12 +47,22 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminLayout>
+                      <AdminDashboard />
+                    </AdminLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/*"
                 element={
                   <ProtectedRoute>
                     <Layout>
                       <Routes>
-                        <Route path="/" element={<Index />} />
+                        <Route path="/" element={<RoleBasedHome />} />
                         <Route path="/novo-orcamento" element={<NovoOrcamento />} />
                         <Route path="/meus-clientes" element={<MeusClientes />} />
                         <Route path="/catalogo" element={<Catalogo />} />
