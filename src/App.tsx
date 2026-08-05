@@ -11,6 +11,7 @@ import { Layout } from "@/components/Layout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RoleBasedHome } from "@/components/RoleBasedHome";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminVendedores from "./pages/admin/AdminVendedores";
 import AdminVendedorDetail from "./pages/admin/AdminVendedorDetail";
@@ -48,6 +49,7 @@ const App = () => (
           <BrandingProvider>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route
                 path="/admin/*"
                 element={

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  MoreHorizontal, Eye, Pencil, Lock, Unlock, UserMinus, UserCheck, KeyRound, Copy,
+  MoreHorizontal, Eye, Pencil, Lock, Unlock, UserMinus, UserCheck, KeyRound, Copy, MailPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,11 @@ const CONFIRM_COPY: Record<
     title: "Enviar recuperação de senha",
     description: "Um e-mail de redefinição de senha será enviado para o vendedor.",
     confirmLabel: "Enviar",
+  },
+  resend_invite: {
+    title: "Reenviar convite",
+    description: "Um novo e-mail de convite será enviado para o vendedor definir a senha.",
+    confirmLabel: "Reenviar",
   },
 };
 
@@ -137,6 +142,9 @@ export function VendedorActionsMenu({
           )}
           <DropdownMenuItem onClick={() => setPendingAction("send_password_reset")} className="gap-2">
             <KeyRound className="h-3.5 w-3.5" /> Enviar recuperação de senha
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setPendingAction("resend_invite")} className="gap-2">
+            <MailPlus className="h-3.5 w-3.5" /> Reenviar convite
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

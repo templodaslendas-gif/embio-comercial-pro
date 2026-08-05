@@ -1,8 +1,8 @@
 # admin-user-actions
 
-Edge Function que bloqueia, desbloqueia, marca como desligado, reativa e
-envia recuperação de senha para contas de vendedores — chamada apenas pelo
-painel `/admin` do Super Admin.
+Edge Function que convida vendedores, reenvia convite, bloqueia, desbloqueia,
+marca como desligado, reativa e envia recuperação de senha para contas de
+vendedores — chamada apenas pelo painel `/admin` do Super Admin.
 
 Não foi possível testar ou implantar esta função nesta sessão: o ambiente
 onde este código foi escrito não tem Supabase CLI, Deno nem Docker
@@ -26,7 +26,19 @@ confirmar que estão disponíveis no seu projeto:
 supabase secrets list --project-ref mnatdneugogtmsjafzar
 ```
 
-Esta função não usa nenhuma outra variável além dessas três.
+Além dessas três, a função usa **`APP_ORIGIN`** (ex.:
+`https://app.embiocomercialpro.com.br`, sem barra final) — a origem
+confiável para onde o link do e-mail de convite/reenvio deve redirecionar
+(`{APP_ORIGIN}/reset-password`). Ela **precisa** ser configurada
+manualmente antes do deploy, pois não tem valor automático:
+
+```bash
+supabase secrets set APP_ORIGIN=https://SEU_DOMINIO_DE_PRODUCAO --project-ref mnatdneugogtmsjafzar
+```
+
+Sem `APP_ORIGIN` configurado, `invite_user` e `resend_invite` retornam
+`500` (falha segura — nunca aceitam um redirect vindo do payload do
+cliente, para não abrir um open redirect).
 
 ## 3. Teste local (antes de implantar)
 
@@ -93,11 +105,14 @@ Rode estes casos com curl ou pela UI, nesta ordem:
 3. **`action` fora da lista permitida** (ex.: `"delete"`) → `400`.
 4. **`targetUserId` que não é um UUID** (ex.: `"abc"`) → `400`.
 5. **Super Admin tentando bloquear a própria conta** (`targetUserId` = id do próprio chamador, `action: "block"`) → `400`.
-6. **Bloqueio real**: `action: "block"` num vendedor de teste → `200`; confirme que esse vendedor não consegue mais logar (tentar login real na tela `/auth`); confirme `profiles.status = 'bloqueado'` para ele.
-7. **Desbloqueio**: `action: "unblock"` no mesmo vendedor → `200`; confirme que o login volta a funcionar e `profiles.status = 'ativo'`.
-8. **Desligamento e reativação**: repita 6 e 7 com `action: "offboard"` e `action: "reactivate"`.
-9. **Recuperação de senha**: `action: "send_password_reset"` → `200`; confirme que o e-mail chega à caixa do vendedor de teste.
-10. **Rate limit**: chame a function duas vezes seguidas (menos de 2s de intervalo) com o mesmo admin → a segunda chamada deve retornar `429`.
+6. **Convite**: `action: "invite_user"` com `email`, `fullName`, `telefone`, `cidade`, `estado` de um endereço de teste → `200`; confirme o e-mail de convite chegando; confirme `profiles`, `user_roles` (`vendedor`) e `branding_settings` criados para o novo `user_id` retornado.
+7. **Convite duplicado**: repita o passo 6 com o mesmo e-mail → deve falhar (não `200`), sem revelar no corpo da resposta se o e-mail já existe.
+8. **Reenvio de convite**: `action: "resend_invite"` com o `targetUserId` do convidado do passo 6 (antes de ele definir a senha) → `200`; confirme novo e-mail chegando.
+9. **Bloqueio real**: `action: "block"` num vendedor de teste → `200`; confirme que esse vendedor não consegue mais logar (tentar login real na tela `/auth`); confirme `profiles.status = 'bloqueado'` para ele.
+10. **Desbloqueio**: `action: "unblock"` no mesmo vendedor → `200`; confirme que o login volta a funcionar e `profiles.status = 'ativo'`.
+11. **Desligamento e reativação**: repita 9 e 10 com `action: "offboard"` e `action: "reactivate"`.
+12. **Recuperação de senha**: `action: "send_password_reset"` → `200`; confirme que o e-mail chega à caixa do vendedor de teste.
+13. **Rate limit**: chame a function duas vezes seguidas (menos de 2s de intervalo) com o mesmo admin → a segunda chamada deve retornar `429`.
 
 Se qualquer um desses passos falhar, pare e revise o código antes de usar a
 função com vendedores reais.

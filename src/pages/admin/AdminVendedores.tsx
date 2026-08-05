@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Search, Users, ShieldCheck } from "lucide-react";
+import { Search, Users, ShieldCheck, UserPlus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchVendedoresOverview, type VendedorOverview } from "@/lib/adminQueries";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,6 +14,7 @@ import {
 import type { PremiumTableColumn } from "@/components/premium/PremiumTable";
 import { VendedorActionsMenu } from "@/components/admin/VendedorActionsMenu";
 import { EditVendedorDialog } from "@/components/admin/EditVendedorDialog";
+import { NovoVendedorDialog } from "@/components/admin/NovoVendedorDialog";
 import { cn } from "@/lib/utils";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -50,6 +52,7 @@ export default function AdminVendedores() {
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [sortBy, setSortBy] = useState<SortBy>("venda");
   const [editing, setEditing] = useState<VendedorOverview | null>(null);
+  const [inviting, setInviting] = useState(false);
 
   const { data: vendedores = [], isLoading } = useQuery({
     queryKey: ["admin", "vendedores-overview"],
@@ -163,6 +166,11 @@ export default function AdminVendedores() {
           badge="Super Admin"
           title="Vendedores"
           subtitle="Gestão de acesso e desempenho comercial da equipe."
+          action={
+            <Button onClick={() => setInviting(true)} className="gap-2">
+              <UserPlus className="h-4 w-4" /> Novo vendedor
+            </Button>
+          }
         />
 
         <PremiumSection label="Filtros">
@@ -273,6 +281,7 @@ export default function AdminVendedores() {
       </div>
 
       <EditVendedorDialog vendedor={editing} onOpenChange={(open) => !open && setEditing(null)} onSaved={refresh} />
+      <NovoVendedorDialog open={inviting} onOpenChange={setInviting} onInvited={refresh} />
     </PremiumPage>
   );
 }

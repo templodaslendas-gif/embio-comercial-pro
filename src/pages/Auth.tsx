@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { LogIn, UserPlus, Loader2, Eye, EyeOff, Users, FileText, LineChart } from "lucide-react";
+import { LogIn, Loader2, Eye, EyeOff, Users, FileText, LineChart, ArrowLeft, MailCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FFRFooter } from "@/components/FFRFooter";
@@ -24,13 +24,13 @@ const BENEFITS = [
 ];
 
 const Auth = () => {
-  const { user, loading, signIn, signUp } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const { user, loading, signIn, resetPassword } = useAuth();
+  const [mode, setMode] = useState<"login" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
@@ -45,29 +45,45 @@ const Auth = () => {
 
   if (user) return <Navigate to="/" replace />;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
-    if (!isLogin && !fullName.trim()) return;
 
     setSubmitting(true);
     try {
-      if (isLogin) {
-        const { error } = await signIn(email.trim(), password);
-        if (error) {
-          toast({ title: t("auth.loginError"), description: error.message, variant: "destructive" });
-        }
-      } else {
-        const { error } = await signUp(email.trim(), password, fullName.trim());
-        if (error) {
-          toast({ title: t("auth.signupError"), description: error.message, variant: "destructive" });
-        } else {
-          toast({ title: t("auth.accountCreated"), description: t("auth.accountCreatedDesc") });
-        }
+      const { error } = await signIn(email.trim(), password);
+      if (error) {
+        toast({ title: t("auth.loginError"), description: error.message, variant: "destructive" });
       }
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+
+    setSubmitting(true);
+    try {
+      // Mensagem sempre neutra, mesmo em erro: nunca revelar se o e-mail
+      // existe ou não na base a quem não está autenticado.
+      await resetPassword(email.trim());
+    } finally {
+      setForgotSent(true);
+      setSubmitting(false);
+    }
+  };
+
+  const switchToForgot = () => {
+    setMode("forgot");
+    setForgotSent(false);
+  };
+
+  const switchToLogin = () => {
+    setMode("login");
+    setForgotSent(false);
+    setPassword("");
   };
 
   return (
@@ -135,112 +151,134 @@ const Auth = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          <div className="space-y-1 mb-8">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              {isLogin ? "Entrar na conta" : "Criar conta"}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {isLogin
-                ? "Use suas credenciais para acessar o sistema."
-                : "Crie sua conta para começar a usar o sistema."}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="space-y-1.5">
-                <Label htmlFor="fullName" className="text-sm font-medium">
-                  {t("auth.fullName")}
-                </Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder={t("auth.fullNamePlaceholder")}
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required={!isLogin}
-                  className="h-12 rounded-xl text-base"
-                  autoComplete="name"
-                />
+          {mode === "login" ? (
+            <>
+              <div className="space-y-1 mb-8">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">Entrar na conta</h1>
+                <p className="text-sm text-muted-foreground">Use suas credenciais para acessar o sistema.</p>
               </div>
-            )}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium">
-                {t("auth.email")}
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={t("auth.emailPlaceholder")}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-12 rounded-xl text-base"
-                autoComplete="email"
-              />
-            </div>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    {t("auth.email")}
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder={t("auth.emailPlaceholder")}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="h-12 rounded-xl text-base"
+                    autoComplete="email"
+                  />
+                </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-medium">
-                {t("auth.password")}
-              </Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder={t("auth.passwordPlaceholder")}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="h-12 rounded-xl text-base pr-10"
-                  autoComplete={isLogin ? "current-password" : "new-password"}
-                />
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    {t("auth.password")}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={t("auth.passwordPlaceholder")}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="h-12 rounded-xl text-base pr-10"
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className={cn(
+                    "w-full h-12 gap-2 rounded-xl font-semibold text-base mt-2",
+                    "transition-all duration-200 hover:shadow-lg",
+                  )}
+                  disabled={submitting}
+                >
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+                  {submitting ? t("common.loading") : t("auth.login")}
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  tabIndex={-1}
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  onClick={switchToForgot}
+                  className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {t("auth.forgotPassword")}
                 </button>
               </div>
-            </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-1 mb-8">
+                <button
+                  type="button"
+                  onClick={switchToLogin}
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  {t("auth.backToLogin")}
+                </button>
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                  {t("auth.forgotPasswordTitle")}
+                </h1>
+                <p className="text-sm text-muted-foreground">{t("auth.forgotPasswordDesc")}</p>
+              </div>
 
-            <Button
-              type="submit"
-              className={cn(
-                "w-full h-12 gap-2 rounded-xl font-semibold text-base mt-2",
-                "transition-all duration-200 hover:shadow-lg",
-              )}
-              disabled={submitting}
-            >
-              {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isLogin ? (
-                <LogIn className="h-4 w-4" />
+              {forgotSent ? (
+                <div className="rounded-xl border border-border/60 bg-muted/40 p-5 flex items-start gap-3">
+                  <MailCheck className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                  <p className="text-sm text-foreground/80">{t("auth.forgotPasswordSent")}</p>
+                </div>
               ) : (
-                <UserPlus className="h-4 w-4" />
-              )}
-              {submitting
-                ? t("common.loading")
-                : isLogin
-                ? t("auth.login")
-                : t("auth.signup")}
-            </Button>
-          </form>
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="forgot-email" className="text-sm font-medium">
+                      {t("auth.email")}
+                    </Label>
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      placeholder={t("auth.emailPlaceholder")}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-12 rounded-xl text-base"
+                      autoComplete="email"
+                    />
+                  </div>
 
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              {isLogin ? t("auth.noAccount") : t("auth.hasAccount")}
-            </button>
-          </div>
+                  <Button
+                    type="submit"
+                    className="w-full h-12 gap-2 rounded-xl font-semibold text-base mt-2 transition-all duration-200 hover:shadow-lg"
+                    disabled={submitting}
+                  >
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {submitting ? t("common.loading") : t("auth.forgotPasswordSubmit")}
+                  </Button>
+                </form>
+              )}
+            </>
+          )}
+
           <FFRFooter className="mt-8" />
         </motion.div>
       </div>
